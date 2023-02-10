@@ -1,15 +1,17 @@
 package VO
 
 type JugadoresVO struct {
-	nombre string
-	contra string
-	perfil []byte
-	descrp string
-	codigo string
+	nombre   string
+	contra   string
+	perfil   []byte
+	descrp   string
+	pjugadas int
+	pganadas int
+	codigo   string
 }
 
-func NewJugadorVO(nombre string, contra string, perfil []byte, descrp string, codigo string) *JugadoresVO {
-	j := JugadoresVO{nombre: nombre, contra: contra, perfil: perfil, descrp: descrp, codigo: codigo}
+func NewJugadorVO(nombre string, contra string, perfil []byte, descrp string, pjugadas int, pganadas int, codigo string) *JugadoresVO {
+	j := JugadoresVO{nombre: nombre, contra: contra, perfil: perfil, descrp: descrp, pjugadas: pjugadas, pganadas: pganadas, codigo: codigo}
 	return &j
 }
 
@@ -56,25 +58,25 @@ func (a *AmistadVO) GetUsr2() string {
 	return a.usr2
 }
 
-type CartaVO struct {
+type CartasVO struct {
 	numero int
 	palo   string
 	foto   []byte
 }
 
-func NewCartaVO(numero int, palo string, foto []byte) *CartaVO {
-	c := CartaVO{numero: numero, palo: palo, foto: foto}
+func NewCartasVO(numero int, palo string, foto []byte) *CartasVO {
+	c := CartasVO{numero: numero, palo: palo, foto: foto}
 	return &c
 }
 
-func (c *CartaVO) GetNumero() int {
+func (c *CartasVO) GetNumero() int {
 	return c.numero
 }
 
-func (c *CartaVO) GetPalo() string {
+func (c *CartasVO) GetPalo() string {
 	return c.palo
 }
 
-func (c *CartaVO) GetFoto() []byte {
+func (c *CartasVO) GetFoto() []byte {
 	return c.foto
 }
