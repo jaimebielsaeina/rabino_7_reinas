@@ -54,7 +54,7 @@ func handleConnection(conn net.Conn, idCliente int) {
 			//anyadirJugador(idPartida, idCliente)
 
 			// Enviar una respuesta al cliente
-			//conn.Write([]byte(idPartida))
+			conn.Write([]byte("1"))
 			
 		} else if m == "unirsePartida" {
 
