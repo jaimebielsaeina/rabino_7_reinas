@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'pages/settings_page.dart';
 import 'pages/login_page.dart';
 import 'pages/add_friend.dart';
 import 'package:image_picker/image_picker.dart';
@@ -40,13 +41,14 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  int _selectedIndex = 0;
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
   }
 
-  int _selectedIndex = 0;
   static final List<Widget> _widgetOptions = <Widget>[
     const MainPage(
       todos: [
@@ -97,6 +99,18 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Text("Cerrar sesión"),
                 ),
               ];
+            },
+            onSelected: (menu) {
+              if (menu == 0) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SettingsPage(),
+                  ),
+                );
+              } else if (menu == 1) {
+
+              }
             },
           ),
         ],
