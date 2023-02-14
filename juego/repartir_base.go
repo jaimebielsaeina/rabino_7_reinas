@@ -57,7 +57,7 @@ func mostrarMano(mano *doublylinkedlist.List){
 	})
 }
 
-func main(){
+func main2(){
 	fmt.Println("Hola1")
 	rand.Seed(time.Now().UnixNano())
 	list := doublylinkedlist.New()

@@ -1,5 +1,5 @@
-module proyecto_software
+module juego
 
-go 1.19
+go 1.20
 
-require github.com/emirpasic/gods v1.18.1
+require github.com/emirpasic/gods v1.18.1 // indirect
