@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'pages/login_page.dart';
+import 'pages/add_friend.dart';
 import 'package:image_picker/image_picker.dart';
 
 class Todo {
@@ -93,7 +94,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 PopupMenuItem(
                   value: 1,
-                  child: Text("Logout"),
+                  child: Text("Cerrar sesión"),
                 ),
               ];
             },
@@ -289,9 +290,7 @@ class _FriendsPageState extends State<FriendsPage> {
               ],
             ),
             subtitle: Text('perro'),
-            onTap: () {
-              openDialog();
-            },
+            onTap: () {},
           );
         },
         separatorBuilder: (context, index) => Container(
@@ -317,7 +316,7 @@ class _FriendsPageState extends State<FriendsPage> {
       ),
       elevation: 0,
       backgroundColor: Colors.transparent,
-      child: LoginPage(),
+      child: AddFriendPage(),
     ),
   );
 }

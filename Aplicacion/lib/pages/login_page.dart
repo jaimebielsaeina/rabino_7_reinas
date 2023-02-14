@@ -47,7 +47,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Email is required';
+                    return 'El campo es obligatorio';
                   }
                   return null;
                 },
@@ -77,7 +77,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Password is required';
+                    return 'El campo es obligatorio';
                   }
                   return null;
                 },
@@ -108,18 +108,16 @@ class _LoginPageState extends State<LoginPage> {
                   onPressed: () {
                     if(_formkey.currentState!.validate()) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: const Text('Bienvenido'),
+                        const SnackBar(
+                          content: Text('Bienvenido'),
                           showCloseIcon: true,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                          closeIconColor: Colors.white,
                         ),
                       );
                       Navigator.pop(context);
                     }
                   },
-                  child: const Text('Login'),
+                  child: const Text('Iniciar sesión'),
                 ),
               ),
               const SizedBox(height: 25),
