@@ -136,7 +136,7 @@ class _MyHomePageState extends State<MyHomePage> {
             label: 'Perfil',
           ),
         ],
-        iconSize: 27,
+        iconSize: 30,
         backgroundColor: Colors.indigo,
         showUnselectedLabels: false,
         selectedItemColor: Colors.amber,
@@ -145,30 +145,19 @@ class _MyHomePageState extends State<MyHomePage> {
         currentIndex: _selectedIndex,
       ),
       drawer: Drawer(
-        child: Container(
-          color: Colors.indigo,
-          padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
-          child: ListView.separated(
-            itemCount: 50,
-            itemBuilder: (_, index) {
-              return DefaultTextStyle(
-                style: const TextStyle(color: Colors.white),
-                child: SizedBox(
-                  height: 50,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: const [
-                      Icon(Icons.home, color: Colors.white),
-                      Text('Esto es una prueba lololololololo')
-                    ],
-                  ),
-                ),
-              );
-            },
-            separatorBuilder: (context, index) => Container(
-              height: 1,
-              color: Colors.white,
-            ),
+        child: ListView.separated(
+          itemCount: 20,
+          itemBuilder: (_, index) {
+            return const ListTile(
+                leading: Icon(Icons.home, color: Colors.indigoAccent),
+                title: Text('Esto es una prueba lololololololo'),
+            );
+          },
+          separatorBuilder: (context, index) => const Divider(
+            height: 1,
+            indent: 10,
+            endIndent: 10,
+            color: Colors.indigoAccent,
           ),
         ),
       ),
@@ -186,24 +175,30 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: ListView.builder(
-        itemCount: widget.todos.length,
-        itemBuilder: (context, index) {
-          return IconButton(
-            icon: Stack(
-              alignment: Alignment.bottomLeft,
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        /*
+        appBar: AppBar(
+          bottom:TabBar(
+            tabs: [
+              Tab(icon: Icon(Icons.tag_faces_rounded),),
+              Tab(icon: Icon(Icons.tag_faces_rounded),),
+            ],
+          ),
+        ),
+        */
+        body: Column(
+          children: [
+            Stack(
+              alignment: Alignment.bottomCenter,
               children: [
-                Hero(
-                  tag: widget.todos[index].id,
-                  child: Image.network(
-                    widget.todos[index].img,
-                    width: 1000,
-                    height: 500,
-                    fit: BoxFit.cover,
-                  ),
+                Image.network(
+                  "https://crehana-blog.imgix.net/media/filer_public/8c/a4/8ca49656-e762-45fc-81e0-948f1e7bc9c3/as-poker.jpeg?auto=format&q=50",
+                  fit: BoxFit.scaleDown,
                 ),
                 Container(
+                  height: 220,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     gradient: LinearGradient(
@@ -216,29 +211,113 @@ class _MainPageState extends State<MainPage> {
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Text(
-                    widget.todos[index].name,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      color: Colors.white,
-                    ),
+                SizedBox(
+                  height: 60,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: ElevatedButton(onPressed: (){}, child: Text('Unirse a partida'),),
+                        ),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: ElevatedButton(onPressed: (){}, child: Text('Crear partida'),),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-            iconSize: 250,
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => GamePage(todo: widget.todos[index]),
-                ),
-              );
-            },
-          );
-        },
+            const Material(
+              color: Colors.indigo,
+              child: TabBar(
+                labelColor: Colors.amber,
+                unselectedLabelColor: Colors.white,
+                indicatorColor: Colors.amber,
+                tabs: [
+                  Tab(
+                    /*
+                    icon: Icon(
+                      Icons.wine_bar,
+                      size: 30,
+                    ),
+                    */
+                    text: 'TORNEOS',
+                  ),
+                  Tab(
+                    /*
+                    icon: Icon(
+                      Icons.bar_chart_outlined,
+                      size: 30,
+                    ),
+                    */
+                    text: 'RANKING',
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: TabBarView(
+                children: [
+                  ListView.separated(
+                    itemCount: 20,
+                    itemBuilder: (_, index) {
+                      return const DefaultTextStyle(
+                        style: TextStyle(color: Colors.white),
+                        child: SizedBox(
+                          child: ListTile(
+                            leading: Icon(
+                              Icons.wine_bar,
+                              size: 35,
+                              color: Colors.amber,
+                            ),
+                            title: Text('Torneo de fulanito'),
+                            //trailing: Icon(Icons.star),
+                          ),
+                        ),
+                      );
+                    },
+                    separatorBuilder: (context, index) => const Divider(
+                      height: 1,
+                      color: Colors.indigoAccent,
+                    ),
+                  ),
+                  ListView.separated(
+                    itemCount: 20,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        leading: FriendListTile(),
+                        title: Row(
+                          children: const [
+                            Text(
+                              'Amigo falso',
+                              style: TextStyle(
+                                color: Colors.blueGrey,
+                                fontSize: 18,
+                              ),
+                            ),
+                          ],
+                        ),
+                        subtitle: Text('perro'),
+                        onTap: () {},
+                      );
+                    },
+                    separatorBuilder: (context, index) => const Divider(
+                      height: 1,
+                      color: Colors.indigoAccent,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -304,10 +383,15 @@ class _FriendsPageState extends State<FriendsPage> {
               ],
             ),
             subtitle: Text('perro'),
+            trailing: Icon(
+              Icons.message,
+              size: 35,
+              color: Colors.indigoAccent,
+            ),
             onTap: () {},
           );
         },
-        separatorBuilder: (context, index) => Container(
+        separatorBuilder: (context, index) => const Divider(
           height: 1,
           color: Colors.indigoAccent,
         ),
@@ -490,8 +574,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 );
               },
-              separatorBuilder: (context, index) =>
-                  Container(height: 1, color: Colors.indigoAccent),
+              separatorBuilder: (context, index) => const Divider(
+                height: 1,
+                color: Colors.indigoAccent,
+              ),
             ),
           ],
         ),
