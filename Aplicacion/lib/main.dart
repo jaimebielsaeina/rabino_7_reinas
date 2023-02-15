@@ -1,10 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'dialogs/add_friend_dialog.dart';
+import 'dialogs/login_dialog.dart';
 import 'pages/settings_page.dart';
-import 'pages/login_page.dart';
-import 'pages/add_friend.dart';
 import 'package:image_picker/image_picker.dart';
 
+/*
 class Todo {
   final int id;
   final String name;
@@ -13,6 +14,7 @@ class Todo {
 
   const Todo(this.id, this.name, this.img, this.msg);
 }
+ */
 
 void main() {
   runApp(const MyApp());
@@ -24,10 +26,23 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Rabino 7 reinas',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.indigo,
+        appBarTheme: const AppBarTheme(
+          color: Colors.indigo,
+          centerTitle: true,
+          iconTheme: IconThemeData(
+            color: Colors.white,
+          ),
+          titleTextStyle: TextStyle(
+            color: Colors.white,
+            fontSize: 22,
+          )
+        ),
+        colorSchemeSeed: Colors.indigo,
+        useMaterial3: true,
+
       ),
       home: const MyHomePage(),
     );
@@ -50,33 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   static final List<Widget> _widgetOptions = <Widget>[
-    const MainPage(
-      todos: [
-        Todo(
-            1,
-            "Uno",
-            "https://eloutput.com/wp-content/uploads/2019/05/uno-cartas.jpg",
-            "Tremendo juegardo"
-        ),
-        Todo(
-            2,
-            "Ajedrez",
-            "https://images.chesscomfiles.com/uploads/v1/blog/530042.33c6be72.5000x5000o.e96f2c4df196.jpeg",
-            "Tremendo juegardo"),
-        Todo(
-            3,
-            "Póker",
-            "https://crehana-blog.imgix.net/media/filer_public/8c/a4/8ca49656-e762-45fc-81e0-948f1e7bc9c3/as-poker.jpeg?auto=format&q=50",
-            "Tremendo juegardo"
-        ),
-        Todo(
-            4,
-            "GTA 5",
-            "https://cdn2.unrealengine.com/Diesel%2Fproductv2%2Fgrand-theft-auto-v%2Fhome%2FGTAV_EGS_Artwork_1920x1080_Hero-Carousel_V06-1920x1080-1503e4b1320d5652dd4f57466c8bcb79424b3fc0.jpg",
-            "Sí, incluso aquí lo puedes jugar"
-        ),
-      ],
-    ),
+    const MainPage(),
     const FriendsPage(),
     const ProfilePage(),
   ];
@@ -85,11 +74,11 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('App no tan mierdosa'),
+        title: const Text('App medio mierdosa'),
         actions: [
           PopupMenuButton(
             itemBuilder: (context) {
-              return [
+              return const [
                 PopupMenuItem(
                   value: 0,
                   child: Text("Ajustes"),
@@ -166,8 +155,8 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class MainPage extends StatefulWidget {
-  const MainPage({super.key, required this.todos});
-  final List<Todo> todos;
+  const MainPage({super.key});
+
   @override
   State<MainPage> createState() => _MainPageState();
 }
@@ -190,49 +179,56 @@ class _MainPageState extends State<MainPage> {
         */
         body: Column(
           children: [
-            Stack(
-              alignment: Alignment.bottomCenter,
-              children: [
-                Image.network(
-                  "https://crehana-blog.imgix.net/media/filer_public/8c/a4/8ca49656-e762-45fc-81e0-948f1e7bc9c3/as-poker.jpeg?auto=format&q=50",
-                  fit: BoxFit.scaleDown,
-                ),
-                Container(
-                  height: 220,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    gradient: LinearGradient(
-                      begin: FractionalOffset.topCenter,
-                      end: FractionalOffset.bottomCenter,
-                      colors: [
-                        Colors.black.withOpacity(0.0),
-                        Colors.black,
+            Container(
+              height: 220,
+              child: Stack(
+                alignment: Alignment.bottomCenter,
+                children: [
+                  Image.network(
+                    "https://crehana-blog.imgix.net/media/filer_public/8c/a4/8ca49656-e762-45fc-81e0-948f1e7bc9c3/as-poker.jpeg?auto=format&q=50",
+                    fit: BoxFit.fill,
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      gradient: LinearGradient(
+                        begin: FractionalOffset.topCenter,
+                        end: FractionalOffset.bottomCenter,
+                        colors: [
+                          Colors.black.withOpacity(0.0),
+                          Colors.black,
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 60,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: FilledButton(onPressed: (){}, child: Text('Unirse a partida'),),
+                          ),
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: FilledButton(
+                              onPressed: (){
+                                openDialog();
+                              },
+                              child: Text('Crear partida'),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
-                ),
-                SizedBox(
-                  height: 60,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(10),
-                          child: ElevatedButton(onPressed: (){}, child: Text('Unirse a partida'),),
-                        ),
-                      ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(10),
-                          child: ElevatedButton(onPressed: (){}, child: Text('Crear partida'),),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
             const Material(
               color: Colors.indigo,
@@ -268,19 +264,22 @@ class _MainPageState extends State<MainPage> {
                   ListView.separated(
                     itemCount: 20,
                     itemBuilder: (_, index) {
-                      return const DefaultTextStyle(
-                        style: TextStyle(color: Colors.white),
-                        child: SizedBox(
-                          child: ListTile(
-                            leading: Icon(
-                              Icons.wine_bar,
-                              size: 35,
-                              color: Colors.amber,
-                            ),
-                            title: Text('Torneo de fulanito'),
-                            //trailing: Icon(Icons.star),
+                      return ListTile(
+                        leading: Hero(
+                          tag: index,
+                          child: Icon(
+                            Icons.wine_bar,
+                            size: 35,
+                            color: Colors.amber,
                           ),
                         ),
+                        title: const Text('Torneo de fulanito'),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => GamePage(id: index))
+                          );
+                        },
                       );
                     },
                     separatorBuilder: (context, index) => const Divider(
@@ -321,31 +320,36 @@ class _MainPageState extends State<MainPage> {
       ),
     );
   }
+
+  Future openDialog() => showDialog(
+    context: context,
+    builder: (context) => const Dialog(
+      child: LoginPage(),
+    ),
+  );
 }
 
+
 class GamePage extends StatelessWidget {
-  const GamePage({super.key, required this.todo});
-  final Todo todo;
+  const GamePage({super.key, required this.id});
+  final int id;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(todo.name),
+        title: Text('Torneo'),
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Hero(
-              tag: todo.id,
-              child: Image.network(todo.img, fit: BoxFit.cover),
-            ),
-            Container(
-              color: Colors.indigo,
-              child: Align(
-                child: Text(
-                  todo.msg,
-                  style: const TextStyle(color: Colors.white, fontSize: 40),
+            Center(
+              child: Hero(
+                tag: id,
+                child: Icon(
+                  Icons.wine_bar,
+                  size: 150,
+                  color: Colors.amber,
                 ),
               ),
             ),
@@ -397,25 +401,19 @@ class _FriendsPageState extends State<FriendsPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.indigo,
+        tooltip: 'Añadir amigo',
         onPressed: () {
           openDialog();
         },
-        tooltip: 'Añadir amigo',
-        child: const Icon(Icons.add_rounded, size: 30),
+        child: const Icon(Icons.add_rounded, size: 30, color: Colors.white,),
       ),
     );
   }
 
   Future openDialog() => showDialog(
     context: context,
-    builder: (context) => Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      elevation: 0,
-      backgroundColor: Colors.transparent,
-      child: AddFriendPage(),
-    ),
+    builder: (context) => AddFriendPage()
   );
 }
 
@@ -765,56 +763,23 @@ class _ProfilePictureState extends State<ProfilePicture> {
 
   Future openDialog() => showDialog(
         context: context,
-        builder: (context) => Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          child: SingleChildScrollView(
-            child: Container(
-              padding: const EdgeInsets.all(15),
-              decoration: BoxDecoration(
-                  color: Colors.white, borderRadius: BorderRadius.circular(10)),
-              child: Column(
-                children: [
-                  const Text(
-                    'Elegir foto de perfil',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  SizedBox(
-                    height: 50,
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        _pickImageFromGallery();
-                      },
-                      child: const Text('Galería'),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  SizedBox(
-                    height: 50,
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        _pickImageFromCamera();
-                      },
-                      child: const Text('Cámara'),
-                    ),
-                  ),
-                ],
-              ),
+        builder: (context) => AlertDialog(
+          title: const Text('Elegir foto de perfil'),
+          actionsAlignment: MainAxisAlignment.spaceEvenly,
+          actions: [
+            FilledButton(
+              onPressed: () {
+                _pickImageFromGallery();
+              },
+              child: const Text('Galería'),
             ),
-          ),
+            FilledButton(
+              onPressed: () {
+                _pickImageFromCamera();
+              },
+              child: const Text('Cámara'),
+            ),
+          ],
         ),
       );
 

@@ -10,13 +10,9 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   final Icon _muted = const Icon(
     Icons.volume_off,
-    size: 30,
-    color: Colors.indigo,
   );
   final Icon _nonMuted = const Icon(
     Icons.volume_up,
-    size: 30,
-    color: Colors.indigo,
   );
 
   double _musicValue = 100;
@@ -28,6 +24,35 @@ class _SettingsPageState extends State<SettingsPage> {
   double _oldSoundEffectsValue = 100;
   bool _muteSoundEffects = false;
   late Icon _soundEffectsIcon = _nonMuted;
+
+  void muteUnmuteMusic() {
+    setState(() {
+      _muteMusic = !_muteMusic;
+      if (_muteMusic) {
+        _oldMusicValue = _musicValue;
+        _musicValue = 0;
+        _musicIcon = _muted;
+      } else {
+        print(_oldMusicValue);
+        _musicValue = _oldMusicValue;
+        _musicIcon = _nonMuted;
+      }
+    });
+  }
+
+  void muteUnmuteSoundEffects() {
+    setState(() {
+      _muteSoundEffects = !_muteSoundEffects;
+      if (_muteSoundEffects) {
+        _oldSoundEffectsValue = _soundEffectsValue;
+        _soundEffectsValue = 0;
+        _soundEffectsIcon = _muted;
+      } else {
+        _soundEffectsValue = _oldSoundEffectsValue;
+        _soundEffectsIcon = _nonMuted;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +76,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     max: 100,
                     divisions: 100,
                     label: _musicValue.round().toString(),
+                    activeColor: Colors.indigoAccent,
                     onChanged: (double value) {
                       if (_muteMusic) {
                         null;
@@ -63,21 +89,10 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
                 IconButton(
-                  onPressed: (){
-                    setState(() {
-                      _muteMusic = !_muteMusic;
-                      if (_muteMusic) {
-                        _oldMusicValue = _musicValue;
-                        _musicValue = 0;
-                        _musicIcon = _muted;
-                      } else {
-                        print(_oldMusicValue);
-                        _musicValue = _oldMusicValue;
-                        _musicIcon = _nonMuted;
-                      }
-                    });
-                  },
+                  color: Colors.indigoAccent,
+                  iconSize: 30,
                   icon: _musicIcon,
+                  onPressed: () {muteUnmuteMusic();},
                 ),
               ],
             ),
@@ -93,6 +108,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     max: 100,
                     divisions: 100,
                     label: _soundEffectsValue.round().toString(),
+                    activeColor: Colors.indigoAccent,
                     onChanged: (double value) {
                       if (_muteSoundEffects) {
                         null;
@@ -105,20 +121,10 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
                 IconButton(
-                  onPressed: (){
-                    setState(() {
-                      _muteSoundEffects = !_muteSoundEffects;
-                      if (_muteSoundEffects) {
-                        _oldSoundEffectsValue = _soundEffectsValue;
-                        _soundEffectsValue = 0;
-                        _soundEffectsIcon = _muted;
-                      } else {
-                        _soundEffectsValue = _oldSoundEffectsValue;
-                        _soundEffectsIcon = _nonMuted;
-                      }
-                    });
-                  },
+                  color: Colors.indigoAccent,
+                  iconSize: 30,
                   icon: _soundEffectsIcon,
+                  onPressed: (){muteUnmuteSoundEffects();},
                 ),
               ],
             ),
