@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'dialogs/add_friend_dialog.dart';
 import 'dialogs/login_dialog.dart';
 import 'pages/settings_page.dart';
+import 'themes/light_theme.dart';
+import 'themes/dark_theme.dart';
 import 'package:image_picker/image_picker.dart';
 
 /*
@@ -25,26 +27,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Rabino 7 reinas',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        appBarTheme: const AppBarTheme(
-          color: Colors.indigo,
-          centerTitle: true,
-          iconTheme: IconThemeData(
-            color: Colors.white,
-          ),
-          titleTextStyle: TextStyle(
-            color: Colors.white,
-            fontSize: 22,
-          )
-        ),
-        colorSchemeSeed: Colors.indigo,
-        useMaterial3: true,
-
-      ),
-      home: const MyHomePage(),
+    return ValueListenableBuilder(
+      valueListenable: SettingsPage.themeNotifier,
+      builder: (context, currentMode, child) {
+        return MaterialApp(
+          title: 'Rabino 7 reinas',
+          debugShowCheckedModeBanner: false,
+          theme: LightTheme.lightTheme,
+          darkTheme: DarkTheme.darkTheme,
+          themeMode: currentMode,
+          home: const MyHomePage(),
+        );
+      }
     );
   }
 }
@@ -126,10 +120,6 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
         iconSize: 30,
-        backgroundColor: Colors.indigo,
-        showUnselectedLabels: false,
-        selectedItemColor: Colors.amber,
-        unselectedItemColor: Colors.white,
         onTap: _onItemTapped,
         currentIndex: _selectedIndex,
       ),
@@ -233,9 +223,6 @@ class _MainPageState extends State<MainPage> {
             const Material(
               color: Colors.indigo,
               child: TabBar(
-                labelColor: Colors.amber,
-                unselectedLabelColor: Colors.white,
-                indicatorColor: Colors.amber,
                 tabs: [
                   Tab(
                     /*

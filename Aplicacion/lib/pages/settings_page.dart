@@ -3,11 +3,15 @@ import 'package:flutter/material.dart';
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
 
+  static final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
+
   @override
   State<SettingsPage> createState() => _SettingsPageState();
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  bool _darkMode = false;
+
   final Icon _muted = const Icon(
     Icons.volume_off,
   );
@@ -61,13 +65,21 @@ class _SettingsPageState extends State<SettingsPage> {
         title: const Text('Ajustes'),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(20),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const Text(
+              'Sonido',
+              style: TextStyle(
+                fontSize: 25,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             Row(
               children: [
-                Container(
-                  width: 80,
+                const SizedBox(
+                  width: 100,
                   child: Text('Música'),
                 ),
                 Expanded(
@@ -76,7 +88,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     max: 100,
                     divisions: 100,
                     label: _musicValue.round().toString(),
-                    activeColor: Colors.indigoAccent,
+                    //activeColor: Colors.indigoAccent,
                     onChanged: (double value) {
                       if (_muteMusic) {
                         null;
@@ -92,14 +104,14 @@ class _SettingsPageState extends State<SettingsPage> {
                   color: Colors.indigoAccent,
                   iconSize: 30,
                   icon: _musicIcon,
-                  onPressed: () {muteUnmuteMusic();},
+                  onPressed: muteUnmuteMusic,
                 ),
               ],
             ),
             Row(
               children: [
-                Container(
-                  width: 80,
+                const SizedBox(
+                  width: 100,
                   child: Text('Efectos de sonido'),
                 ),
                 Expanded(
@@ -108,7 +120,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     max: 100,
                     divisions: 100,
                     label: _soundEffectsValue.round().toString(),
-                    activeColor: Colors.indigoAccent,
+                    //activeColor: Colors.indigoAccent,
                     onChanged: (double value) {
                       if (_muteSoundEffects) {
                         null;
@@ -124,10 +136,46 @@ class _SettingsPageState extends State<SettingsPage> {
                   color: Colors.indigoAccent,
                   iconSize: 30,
                   icon: _soundEffectsIcon,
-                  onPressed: (){muteUnmuteSoundEffects();},
+                  onPressed: muteUnmuteSoundEffects,
                 ),
               ],
             ),
+            const SizedBox(height: 10,),
+            const Divider(
+              color: Colors.indigoAccent,
+            ),
+            const SizedBox(height: 10,),
+            const Text(
+              'Tema',
+              style: TextStyle(
+                fontSize: 25,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Row(
+              children: [
+                const SizedBox(
+                  width: 100,
+                  child: Text('Modo oscuro'),
+                ),
+                const Expanded(
+                  child: SizedBox(),
+                ),
+                Switch(
+                  value: _darkMode,
+                  onChanged: (value) {
+                    setState(() {
+                      _darkMode = value;
+                      if (_darkMode) {
+                        SettingsPage.themeNotifier.value = ThemeMode.dark;
+                      } else {
+                        SettingsPage.themeNotifier.value = ThemeMode.light;
+                      }
+                    });
+                  },
+                ),
+              ],
+            )
           ],
         ),
       ),
