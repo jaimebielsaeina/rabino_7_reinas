@@ -32,10 +32,8 @@ class _LoginPageState extends State<LoginPage> {
     return Form(
       key: _formkey,
       child: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.all(15),
-          decoration: BoxDecoration(
-              color: Colors.white, borderRadius: BorderRadius.circular(10)),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
           child: Column(
             children: [
               TextFormField(
@@ -100,11 +98,11 @@ class _LoginPageState extends State<LoginPage> {
                 onPressed: () {},
                 child: const Text('¿Olvidaste la contraseña?'),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 15),
               SizedBox(
                 width: double.infinity,
                 height: 50,
-                child: ElevatedButton(
+                child: FilledButton(
                   onPressed: () {
                     if(_formkey.currentState!.validate()) {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -120,12 +118,30 @@ class _LoginPageState extends State<LoginPage> {
                   child: const Text('Iniciar sesión'),
                 ),
               ),
-              const SizedBox(height: 25),
-              const Text(
-                'O registrarse con',
-                style: TextStyle(color: Colors.grey),
+              const SizedBox(height: 10),
+              Row(
+                children: const [
+                  Expanded(
+                    child: Divider(
+                      color: Colors.grey,
+                    ),
+                  ),
+                  SizedBox(width: 5,),
+                  Text(
+                    'O registrarse con',
+                    style: TextStyle(
+                      color: Colors.grey,
+                    ),
+                  ),
+                  SizedBox(width: 5,),
+                  Expanded(
+                    child: Divider(
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 25),
+              const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
