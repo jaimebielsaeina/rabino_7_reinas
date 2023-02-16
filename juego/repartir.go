@@ -398,15 +398,42 @@ func abrir(jugada *doublylinkedlist.List, mano *doublylinkedlist.List, t *tabler
 
 }
 
+// función para añadir una carta a una combinación
+func anyadirCarta(jugada *doublylinkedlist.List, mano *doublylinkedlist.List, t *tablero, idCombinacion int) {
+	if !jugada.Empty() {
+		v1, _ := jugada.Get(0)
+		carta, _ := v1.(Carta)
+
+		i := 0
+		for e := t.Combinaciones.Front(); e != nil; e = e.Next() {
+			if i == idCombinacion {
+				listaC := e.Value.(*doublylinkedlist.List)
+				listaC.Add(carta)
+				//falta comprobar trio y escalera
+				t.Combinaciones.Remove(e)
+				t.Combinaciones.PushBack(listaC)
+				ind := mano.IndexOf(carta)
+				mano.Remove(ind)
+				return
+			}
+			i++
+		}
+	}
+}
+
 func mostrarTablero(t tablero) {
 	fmt.Println("MAZO: ", t.Mazo)
 
 	fmt.Println("DESCARTES: ", t.Descartes)
 
+	fmt.Println("COMBINACIONES: ", t.Combinaciones)
+
 	l := t.Combinaciones
 	for e := l.Front(); e != nil; e = e.Next() {
 		fmt.Println(e.Value)
 	}
+	fmt.Println("---------------------------------------\n")
+
 }
 
 func iniciarTablero() (tablero, *doublylinkedlist.List) {
@@ -437,12 +464,15 @@ func realizarJugada(t *tablero, mano *doublylinkedlist.List, jugada int, i int, 
 			abrir(cartasAjugar, mano, t)
 		}
 		return
+	case 3: //Añadir 1 carta a una combinación existente
+		anyadirCarta(cartasAjugar, mano, t, 0)
+		return
 	default:
 	}
 }
 
 func main() {
-	fmt.Println("Hola1")
+	/*fmt.Println("Hola1")
 	rand.Seed(time.Now().UnixNano())
 	mazo := doublylinkedlist.New()
 	// descarte := doublylinkedlist.New()
@@ -484,7 +514,7 @@ func main() {
 			}
 		}
 
-	}
+	}*/
 
 	// for i := 0; i < comb.Size(); i++ {
 	// 	fmt.Printf("combinacion %d: \n", i)
@@ -552,12 +582,14 @@ func main() {
 
 	// mostrarMano(mano)
 	// fmt.Println("--------------------------")
-	// mostrarTablero(t)
+	t,mano := iniciarTablero()
+	mostrarTablero(t)
+	mostrarMano(mano)
 
-	// jugada := doublylinkedlist.New()
-	// v1, _ := mano.Get(0)
-	// carta, _ := v1.(Carta)
-	// jugada.Add(carta)
+	jugada := doublylinkedlist.New()
+	v1, _ := mano.Get(0)
+	carta, _ := v1.(Carta)
+	jugada.Add(carta)
 	// v1, _ = mano.Get(1)
 	// carta, _ = v1.(Carta)
 	// jugada.Add(carta)
@@ -576,10 +608,27 @@ func main() {
 	// v1, _ = mano.Get(6)
 	// carta, _ = v1.(Carta)
 	// jugada.Add(carta)
+	c := doublylinkedlist.New()
+	v1, _ = t.Mazo.Get(0)
+	carta, _ = v1.(Carta)
+	v1, _ = t.Mazo.Get(1)
+	carta2, _ := v1.(Carta)
+	v1, _ = t.Mazo.Get(2)
+	carta3, _ := v1.(Carta)
+	c.Add(carta)
+	c.Add(carta2)
+	c.Add(carta3)
+	t.Combinaciones.PushBack(c)
+	c1 := doublylinkedlist.New()
+	c1.Add(carta2)
+	c1.Add(carta3)
+	c1.Add(carta)
+	t.Combinaciones.PushBack(c1)
+	mostrarTablero(t)
 
-	// realizarJugada(&t, mano, 0, i, jugada)
-	// mostrarTablero(t)
-	// mostrarMano(mano)
+	realizarJugada(&t, mano, 3, 0, jugada)
+	mostrarTablero(t)
+	mostrarMano(mano)
 
 	// realizarJugada(&t, mano, 1, i, jugada)
 	// mostrarTablero(t)
