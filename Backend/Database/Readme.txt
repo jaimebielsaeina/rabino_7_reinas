@@ -1,4 +1,7 @@
-(Es necesaria la instalación de docker o docker desktop, en caso de Windows)
+No instaleis docker en windows -> crear una maquina virtual con docker 
+(en caso de que la maquina virtual os vaya muy lenta (mi caso) conectar con 
+una red anfitrión la maquina virtual y así al ejecutar docker podeis ejecutar 
+pgAdmin en un navegador que no sea el de la maquina virtual)
 
 Para crear y ejecutar la base de datos -> docker-compose up
 
@@ -9,6 +12,6 @@ Escribir en name Pro_Soft y en address postgres y en contraseña 1234 y save y a
 
 Una vez hecho esto se puede iniciar desde la aplicación de docker
 
-Ejecutar el main para añadir un usuario
+Ejecutar el main para ejecutar las pruebas
 
 
