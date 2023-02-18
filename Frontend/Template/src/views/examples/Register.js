@@ -32,57 +32,61 @@ import {
   Col
 } from "reactstrap";
 
+import React, {useState} from "react"
+
 const Register = () => {
+
+  //Cosas que vamos a guardar para el formulario
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [name, setName] = useState('')
+  
+  //Guardar el cambio en los atributos
+  const handleEmailChange = event => {
+    setEmail(event.target.value)
+  };
+
+  const handlePasswordChange = event => {
+    setPassword(event.target.value)
+  };
+
+  const handleNameChange = event => {
+    setName(event.target.value)
+  };
+  
+  //Submit al servidor
+  const registerSubmit = event => {
+    event.preventDefault();
+    alert(`Your state values:
+            email: ${email}
+            password: ${password}
+            name: ${name}
+            Se ha mandado al servidor la información`);
+
+    //Petición http
+    var xhr = new XMLHttpRequest()
+    xhr.addEventListener('load', () => {
+      // update the state of the component with the result here
+      console.log(xhr.responseText)
+    })
+
+    // Abrimos una request de tipo post en nuestro servidor
+    xhr.open('POST', 'http://localhost:3001/api/auth/register')
+    
+    //Mandamos la request con el email y la contraseña
+    xhr.send(JSON.stringify({ name: name, email: email , password: password }))
+
+  };
+
   return (
     <>
       <Col lg="6" md="8">
         <Card className="bg-secondary shadow border-0">
-          <CardHeader className="bg-transparent pb-5">
-            <div className="text-muted text-center mt-2 mb-4">
-              <small>Sign up with</small>
-            </div>
-            <div className="text-center">
-              <Button
-                className="btn-neutral btn-icon mr-4"
-                color="default"
-                href="#pablo"
-                onClick={(e) => e.preventDefault()}
-              >
-                <span className="btn-inner--icon">
-                  <img
-                    alt="..."
-                    src={
-                      require("../../assets/img/icons/common/github.svg")
-                        .default
-                    }
-                  />
-                </span>
-                <span className="btn-inner--text">Github</span>
-              </Button>
-              <Button
-                className="btn-neutral btn-icon"
-                color="default"
-                href="#pablo"
-                onClick={(e) => e.preventDefault()}
-              >
-                <span className="btn-inner--icon">
-                  <img
-                    alt="..."
-                    src={
-                      require("../../assets/img/icons/common/google.svg")
-                        .default
-                    }
-                  />
-                </span>
-                <span className="btn-inner--text">Google</span>
-              </Button>
-            </div>
-          </CardHeader>
           <CardBody className="px-lg-5 py-lg-5">
             <div className="text-center text-muted mb-4">
-              <small>Or sign up with credentials</small>
+              <small>Introduzca sus datos</small>
             </div>
-            <Form role="form">
+            <Form role="form" onSubmit={registerSubmit}>
               <FormGroup>
                 <InputGroup className="input-group-alternative mb-3">
                   <InputGroupAddon addonType="prepend">
@@ -90,7 +94,12 @@ const Register = () => {
                       <i className="ni ni-hat-3" />
                     </InputGroupText>
                   </InputGroupAddon>
-                  <Input placeholder="Name" type="text" />
+                  <Input 
+                    placeholder="Nombre de avatar" 
+                    type="text" 
+                    onChange={handleNameChange}
+                    value={name}
+                  />
                 </InputGroup>
               </FormGroup>
               <FormGroup>
@@ -104,6 +113,8 @@ const Register = () => {
                     placeholder="Email"
                     type="email"
                     autoComplete="new-email"
+                    onChange={handleEmailChange}
+                    value={email}
                   />
                 </InputGroup>
               </FormGroup>
@@ -115,16 +126,18 @@ const Register = () => {
                     </InputGroupText>
                   </InputGroupAddon>
                   <Input
-                    placeholder="Password"
+                    placeholder="Contraseña"
                     type="password"
                     autoComplete="new-password"
+                    onChange={handlePasswordChange}
+                    value={password}
                   />
                 </InputGroup>
               </FormGroup>
               <div className="text-muted font-italic">
                 <small>
-                  password strength:{" "}
-                  <span className="text-success font-weight-700">strong</span>
+                  Seguridad de contraseña:{" "}
+                  <span className="text-red font-weight-700">debil</span>
                 </small>
               </div>
               <Row className="my-4">
@@ -140,9 +153,9 @@ const Register = () => {
                       htmlFor="customCheckRegister"
                     >
                       <span className="text-muted">
-                        I agree with the{" "}
+                        Estoy de acuerdo con los{" "}
                         <a href="#pablo" onClick={(e) => e.preventDefault()}>
-                          Privacy Policy
+                         Terminos y condiciones de uso
                         </a>
                       </span>
                     </label>
@@ -150,8 +163,8 @@ const Register = () => {
                 </Col>
               </Row>
               <div className="text-center">
-                <Button className="mt-4" color="primary" type="button">
-                  Create account
+                <Button className="mt-4" color="primary" type="submit">
+                  Crear cuenta
                 </Button>
               </div>
             </Form>

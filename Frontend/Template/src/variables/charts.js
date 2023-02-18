@@ -319,7 +319,7 @@ let chartExample1 = {
           ticks: {
             callback: function (value) {
               if (!(value % 10)) {
-                return "$" + value + "k";
+                return  value ;
               }
             }
           }
@@ -337,7 +337,6 @@ let chartExample1 = {
             content += label;
           }
 
-          content += "$" + yLabel + "k";
           return content;
         }
       }
@@ -403,7 +402,7 @@ let chartExample2 = {
     labels: ["Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
     datasets: [
       {
-        label: "Sales",
+        label: "Partidas Ganadas",
         data: [25, 20, 30, 22, 17, 29],
         maxBarThickness: 10
       }

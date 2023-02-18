@@ -1,3 +1,4 @@
+/*
 package main
 
 import (
@@ -55,20 +56,20 @@ func handleConnection(conn net.Conn, idCliente int) {
 
 			// Enviar una respuesta al cliente
 			conn.Write([]byte("1"))
-			
+
 		} else if m == "unirsePartida" {
 
-			
+
 
 
 		} else if m == "empezarPartida" {
 
-			
+
 
 
 		} else if m == "jugada" {
 
-			
+
 
 
 		} else if m == "chat" {
@@ -77,10 +78,12 @@ func handleConnection(conn net.Conn, idCliente int) {
 
 		} else if m == "finPartida" {
 			fin = true
-		
+
 
 		}
 	}
 	// Cerrar la conexión
 	conn.Close()
 }
+
+*/

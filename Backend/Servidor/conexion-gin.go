@@ -1,11 +1,23 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
-	_"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 )
+
+// Nombres y contenido del struct debe ser publico si no no se hace el binding
+type Login struct {
+	Email    string `json:"email" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
+type Register struct {
+	Name     string `json:"name" binding:"required"`
+	Email    string `json:"email" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
 
 func main() {
 	// Set the router as the default one shipped with Gin
@@ -14,13 +26,30 @@ func main() {
 	// Setup route group for the API
 	api := router.Group("/api")
 	{
-		api.GET("/auth/login", func(c *gin.Context) {
-			c.JSON(http.StatusOK, gin.H{
-				"message": "pong",
-			})
+
+		api.POST("/auth/login", func(c *gin.Context) {
+			u := Login{}
+			//Con el binding guardamos el json de la petición en u que es de tipo login
+			if err := c.BindJSON(&u); err != nil {
+				c.AbortWithError(http.StatusBadRequest, err)
+				return
+			}
+			fmt.Println(u)
+			c.JSON(http.StatusAccepted, &u)
+		})
+
+		api.POST("/auth/register", func(c *gin.Context) {
+			u := Register{}
+			//Con el binding guardamos el json de la petición en u que es de tipo login
+			if err := c.BindJSON(&u); err != nil {
+				c.AbortWithError(http.StatusBadRequest, err)
+				return
+			}
+			fmt.Println(u)
+			c.JSON(http.StatusAccepted, &u)
 		})
 	}
 
 	// Start and run the server
-	router.Run(":3000")
+	router.Run(":3001")
 }

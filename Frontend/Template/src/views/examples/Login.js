@@ -20,7 +20,6 @@
 import {
   Button,
   Card,
-  CardHeader,
   CardBody,
   FormGroup,
   Form,
@@ -32,59 +31,64 @@ import {
   Col
 } from "reactstrap";
 
-import axios from "axios";
+import React, {useState} from "react"
 
-const Login = () => {
+/*
+import Cookies from 'universal-cookie';
+const cookies = new Cookies();
+cookies.set('myCat', 'Pacman', { path: '/' });
+console.log(cookies.get('myCat')); // Pacman
+*/
+
+
+const Login = () => {   
+
+  //Cosas que vamos a guardar para el formulario
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  
+  //Guardar el cambio en los atributos
+  const handleEmailChange = event => {
+    setEmail(event.target.value)
+  };
+
+  const handlePasswordChange = event => {
+    setPassword(event.target.value)
+  };
+  
+  //Submit al servidor
+  const loginSubmit = event => {
+    event.preventDefault();
+    alert(`Your state values: 
+            email: ${email} 
+            password: ${password}
+            Se ha mandado al servidor la información`);
+
+    //Petición http
+    var xhr = new XMLHttpRequest()
+    xhr.addEventListener('load', () => {
+      // update the state of the component with the result here
+      console.log(xhr.responseText)
+    })
+
+    // Abrimos una request de tipo post en nuestro servidor
+    xhr.open('POST', 'http://localhost:3001/api/auth/login')
+    
+    //Mandamos la request con el email y la contraseña
+    xhr.send(JSON.stringify({ email: email , password: password }))
+
+  };
+  
+  
   return (
     <>
       <Col lg="5" md="7">
         <Card className="bg-secondary shadow border-0">
-          <CardHeader className="bg-transparent pb-5">
-            <div className="text-muted text-center mt-2 mb-3">
-              <small>Sign in with</small>
-            </div>
-            <div className="btn-wrapper text-center">
-              <Button
-                className="btn-neutral btn-icon"
-                color="default"
-                href="#pablo"
-                onClick={(e) => e.preventDefault()}
-              >
-                <span className="btn-inner--icon">
-                  <img
-                    alt="..."
-                    src={
-                      require("../../assets/img/icons/common/github.svg")
-                        .default
-                    }
-                  />
-                </span>
-                <span className="btn-inner--text">Github</span>
-              </Button>
-              <Button
-                className="btn-neutral btn-icon"
-                color="default"
-                href="#pablo"
-                onClick={(e) => e.preventDefault()}
-              >
-                <span className="btn-inner--icon">
-                  <img
-                    alt="..."
-                    src={
-                      require("../../assets/img/icons/common/google.svg")
-                        .default
-                    }
-                  />
-                </span>
-                <span className="btn-inner--text">Google</span>
-              </Button>
-            </div>
-          </CardHeader>
           <CardBody className="px-lg-5 py-lg-5">
             <div className="text-center text-muted mb-4">
-              <small>Or sign in with credentials</small>
+              <small>Inicie Sesión introduciendo sus datos</small>
             </div>
-            <Form role="form">
+            <Form role="form" onSubmit={loginSubmit}> 
               <FormGroup className="mb-3">
                 <InputGroup className="input-group-alternative">
                   <InputGroupAddon addonType="prepend">
@@ -96,6 +100,9 @@ const Login = () => {
                     placeholder="Email"
                     type="email"
                     autoComplete="new-email"
+                    //
+                    onChange={handleEmailChange}
+                    value={email}
                   />
                 </InputGroup>
               </FormGroup>
@@ -107,9 +114,12 @@ const Login = () => {
                     </InputGroupText>
                   </InputGroupAddon>
                   <Input
-                    placeholder="Password"
+                    placeholder="Contraseña"
                     type="password"
                     autoComplete="new-password"
+                    //
+                    onChange={handlePasswordChange}
+                    value={password}
                   />
                 </InputGroup>
               </FormGroup>
@@ -123,12 +133,12 @@ const Login = () => {
                   className="custom-control-label"
                   htmlFor=" customCheckLogin"
                 >
-                  <span className="text-muted">Remember me</span>
+                  <span className="text-muted">Recordar datos</span>
                 </label>
               </div>
               <div className="text-center">
-                <Button className="my-4" color="primary" type="button" onClick={() => Login()}>
-                  Sign in
+                <Button className="my-4" color="primary" type="submit">
+                  Iniciar Sesión
                 </Button>
               </div>
             </Form>
@@ -141,7 +151,7 @@ const Login = () => {
               href="#pablo"
               onClick={(e) => e.preventDefault()}
             >
-              <small>Forgot password?</small>
+              <small>¿Ha olvidado su contraseña?</small>
             </a>
           </Col>
           <Col className="text-right" xs="6">
@@ -150,20 +160,13 @@ const Login = () => {
               href="#pablo"
               onClick={(e) => e.preventDefault()}
             >
-              <small>Create new account</small>
+              <small>Crear una cuenta</small>
             </a>
           </Col>
         </Row>
       </Col>
     </>
   );
-
-  function Login(){
-    var url = "http://localhost:3000/api/auth/login"
-    axios.get(url, { 
-    }).then(response => {
-    })
-}
 
 };
 
