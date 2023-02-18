@@ -12,9 +12,9 @@ class AddFriendPage extends StatelessWidget {
       content: Form(
         key: addFriendFormKey,
         child: TextFormField(
+          autofocus: true,
           keyboardType: TextInputType.text,
           decoration: const InputDecoration(
-            border: OutlineInputBorder(),
             hintText: '#1234',
           ),
           validator: (value) {
@@ -25,7 +25,8 @@ class AddFriendPage extends StatelessWidget {
           },
         ),
       ),
-      actionsAlignment: MainAxisAlignment.spaceEvenly,
+      scrollable: true,
+      actionsAlignment: MainAxisAlignment.spaceAround,
       actions: [
         FilledButton(
           onPressed: () {
@@ -34,7 +35,6 @@ class AddFriendPage extends StatelessWidget {
                 const SnackBar(
                   content: Text('Amigo añadido'),
                   showCloseIcon: true,
-                  closeIconColor: Colors.white,
                 ),
               );
               Navigator.pop(context);

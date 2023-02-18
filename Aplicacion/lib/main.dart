@@ -3,22 +3,14 @@ import 'package:flutter/material.dart';
 import 'dialogs/add_friend_dialog.dart';
 import 'dialogs/login_dialog.dart';
 import 'pages/settings_page.dart';
+import 'services/local_storage.dart';
 import 'themes/light_theme.dart';
 import 'themes/dark_theme.dart';
 import 'package:image_picker/image_picker.dart';
 
-/*
-class Todo {
-  final int id;
-  final String name;
-  final String img;
-  final String msg;
-
-  const Todo(this.id, this.name, this.img, this.msg);
-}
- */
-
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await LocalStorage.configurePrefs();
   runApp(const MyApp());
 }
 
@@ -52,7 +44,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
 
-  void _onItemTapped(int index) {
+  void onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
@@ -120,24 +112,38 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
         iconSize: 30,
-        onTap: _onItemTapped,
+        onTap: onItemTapped,
         currentIndex: _selectedIndex,
       ),
       drawer: Drawer(
-        child: ListView.separated(
-          itemCount: 20,
-          itemBuilder: (_, index) {
-            return const ListTile(
-                leading: Icon(Icons.home, color: Colors.indigoAccent),
-                title: Text('Esto es una prueba lololololololo'),
-            );
-          },
-          separatorBuilder: (context, index) => const Divider(
-            height: 1,
-            indent: 10,
-            endIndent: 10,
-            color: Colors.indigoAccent,
+        width: 80,
+        child: NavigationRail(
+          leading: FloatingActionButton(
+            shape: const CircleBorder(
+                side: BorderSide.none,
+            ),
+            onPressed: (){},
+            child: const Icon(Icons.add),
           ),
+          selectedIndex: _selectedIndex,
+          onDestinationSelected: onItemTapped,
+          destinations: const [
+            NavigationRailDestination(
+              icon: Icon(Icons.games_outlined),
+              selectedIcon: Icon(Icons.games_rounded),
+              label: Text('Juegos'),
+            ),
+            NavigationRailDestination(
+              icon: Icon(Icons.people_alt_outlined),
+              selectedIcon: Icon(Icons.people_alt),
+              label: Text('Amigos'),
+            ),
+            NavigationRailDestination(
+              icon: Icon(Icons.account_circle_outlined),
+              selectedIcon: Icon(Icons.account_circle),
+              label: Text('Perfil'),
+            ),
+          ],
         ),
       ),
     );
@@ -167,9 +173,10 @@ class _MainPageState extends State<MainPage> {
           ),
         ),
         */
-        body: Column(
+        body:
+        Column(
           children: [
-            Container(
+            SizedBox(
               height: 220,
               child: Stack(
                 alignment: Alignment.bottomCenter,
@@ -185,11 +192,64 @@ class _MainPageState extends State<MainPage> {
                         begin: FractionalOffset.topCenter,
                         end: FractionalOffset.bottomCenter,
                         colors: [
-                          Colors.black.withOpacity(0.0),
+                          Colors.black.withOpacity(0.4),
                           Colors.black,
                         ],
                       ),
                     ),
+                  ),
+                  Column(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          gradient: LinearGradient(
+                            begin: FractionalOffset.topCenter,
+                            end: FractionalOffset.bottomCenter,
+                            colors: [
+                              Colors.black.withOpacity(0.0),
+                              Colors.black,
+                            ],
+                          ),
+                        ),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.all(10),
+                        height: 70,
+                        width: 70,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.indigoAccent,
+                            width: 3.0,
+                          ),
+                        ),
+                        child: const CircleAvatar(
+                          backgroundImage: ResizeImage(
+                            AssetImage('images/pepoclown.jpg'),
+                            width: 140,
+                            height: 140,
+                          ),
+                          radius: 35,
+                        ),
+                      ),
+                      const Text(
+                        'Ismaber',
+                        style: TextStyle(
+                          color: Colors.indigoAccent,
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const Text(
+                        'Puntos: 9000',
+                        style: TextStyle(
+                          color: Colors.blueGrey,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                   SizedBox(
                     height: 60,
@@ -269,10 +329,7 @@ class _MainPageState extends State<MainPage> {
                         },
                       );
                     },
-                    separatorBuilder: (context, index) => const Divider(
-                      height: 1,
-                      color: Colors.indigoAccent,
-                    ),
+                    separatorBuilder: (context, index) => const Divider(),
                   ),
                   ListView.separated(
                     itemCount: 20,
@@ -291,13 +348,35 @@ class _MainPageState extends State<MainPage> {
                           ],
                         ),
                         subtitle: Text('perro'),
+                        trailing: (index == 0)? 
+                          const Icon(
+                            Icons.wine_bar,
+                            color: Colors.amber,
+                            size: 35,
+                          )
+                        : (index == 1)?
+                          const Icon(
+                            Icons.wine_bar,
+                            color: Colors.grey,
+                            size: 35,
+                          )
+                        : (index == 2)?
+                          const Icon(
+                            Icons.wine_bar,
+                            color: Colors.deepOrangeAccent,
+                            size: 35,
+                          )
+                        : Text(
+                            '$index',
+                            style: const TextStyle(
+                              fontSize: 25,
+                              color: Colors.indigoAccent
+                            ),
+                          ),
                         onTap: () {},
                       );
                     },
-                    separatorBuilder: (context, index) => const Divider(
-                      height: 1,
-                      color: Colors.indigoAccent,
-                    ),
+                    separatorBuilder: (context, index) => const Divider(),
                   ),
                 ],
               ),
@@ -375,17 +454,14 @@ class _FriendsPageState extends State<FriendsPage> {
             ),
             subtitle: Text('perro'),
             trailing: Icon(
-              Icons.message,
+              Icons.chat,
               size: 35,
               color: Colors.indigoAccent,
             ),
             onTap: () {},
           );
         },
-        separatorBuilder: (context, index) => const Divider(
-          height: 1,
-          color: Colors.indigoAccent,
-        ),
+        separatorBuilder: (context, index) => const Divider(),
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.indigo,
@@ -453,7 +529,6 @@ class _ProfilePageState extends State<ProfilePage> {
             const Profile(),
             Container(
               padding: const EdgeInsets.all(20),
-              color: Colors.indigo[50],
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -531,38 +606,28 @@ class _ProfilePageState extends State<ProfilePage> {
               physics: const NeverScrollableScrollPhysics(),
               itemCount: 20,
               itemBuilder: (_, index) {
-                return DefaultTextStyle(
-                  style: const TextStyle(color: Colors.white),
-                  child: SizedBox(
-                    child: Row(
-                      children: const [
-                        Padding(
-                          padding: EdgeInsets.all(10),
-                          child: Icon(
-                            Icons.star,
-                            color: Colors.indigoAccent,
-                            size: 35,
-                          ),
-                        ),
-                        Text(
-                          'Victoria magistral',
-                          style: TextStyle(
-                            color: Colors.black,
-                          ),
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Icon(Icons.thumb_up),
-                      ],
+                return ListTile(
+                  title: const Text(
+                    '1º Puesto',
+                    style: TextStyle(
+                      color: Colors.lightBlue,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
+                  subtitle: const Text('Torneo de fulanito'),
+                  trailing: const Text(
+                    '+100',
+                    style: TextStyle(
+                      color: Colors.lightBlue,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  onTap: (){},
                 );
               },
-              separatorBuilder: (context, index) => const Divider(
-                height: 1,
-                color: Colors.indigoAccent,
-              ),
+              separatorBuilder: (context, index) => const Divider(),
             ),
           ],
         ),
@@ -666,7 +731,6 @@ class _ProfilePictureState extends State<ProfilePicture> {
             Container(
               height: 300,
               width: double.infinity,
-              color: Colors.indigo[50],
               child: image == null
                 ? IconButton(
                   padding: const EdgeInsets.all(0),
@@ -674,7 +738,7 @@ class _ProfilePictureState extends State<ProfilePicture> {
                     openDialog();
                   },
                   iconSize: 300,
-                  icon: Hero(
+                  icon: const Hero(
                     tag: 'foto',
                     child: CircleAvatar(
                       backgroundImage: ResizeImage(
@@ -752,7 +816,8 @@ class _ProfilePictureState extends State<ProfilePicture> {
         context: context,
         builder: (context) => AlertDialog(
           title: const Text('Elegir foto de perfil'),
-          actionsAlignment: MainAxisAlignment.spaceEvenly,
+          scrollable: true,
+          actionsAlignment: MainAxisAlignment.spaceAround,
           actions: [
             FilledButton(
               onPressed: () {

@@ -1,12 +1,26 @@
 import 'package:flutter/material.dart';
+import '../services/local_storage.dart';
+
+ValueNotifier<ThemeMode> themeNotifierValue() {
+  if (LocalStorage.prefs.getBool('darkMode') != null) {
+    if (LocalStorage.prefs.getBool('darkMode') as bool) {
+      return ValueNotifier(ThemeMode.dark);
+    } else {
+      return ValueNotifier(ThemeMode.light);
+    }
+  } else {
+    return ValueNotifier(ThemeMode.light);
+  }
+}
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
 
-  static final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
+  static final ValueNotifier<ThemeMode> themeNotifier = themeNotifierValue();
 
   @override
   State<SettingsPage> createState() => _SettingsPageState();
+
 }
 
 class _SettingsPageState extends State<SettingsPage> {
@@ -32,12 +46,12 @@ class _SettingsPageState extends State<SettingsPage> {
   void muteUnmuteMusic() {
     setState(() {
       _muteMusic = !_muteMusic;
+      LocalStorage.prefs.setBool('muteMusic', _muteMusic);
       if (_muteMusic) {
         _oldMusicValue = _musicValue;
         _musicValue = 0;
         _musicIcon = _muted;
       } else {
-        print(_oldMusicValue);
         _musicValue = _oldMusicValue;
         _musicIcon = _nonMuted;
       }
@@ -47,6 +61,7 @@ class _SettingsPageState extends State<SettingsPage> {
   void muteUnmuteSoundEffects() {
     setState(() {
       _muteSoundEffects = !_muteSoundEffects;
+      LocalStorage.prefs.setBool('muteSoundEffects', _muteSoundEffects);
       if (_muteSoundEffects) {
         _oldSoundEffectsValue = _soundEffectsValue;
         _soundEffectsValue = 0;
@@ -56,6 +71,62 @@ class _SettingsPageState extends State<SettingsPage> {
         _soundEffectsIcon = _nonMuted;
       }
     });
+  }
+
+  void setDarkMode() {
+    if (_darkMode) {
+      SettingsPage.themeNotifier.value = ThemeMode.dark;
+    } else {
+      SettingsPage.themeNotifier.value = ThemeMode.light;
+    }
+  }
+
+  @override
+  void initState() {
+    if(LocalStorage.prefs.getDouble('musicValue') != null) {
+      _musicValue = LocalStorage.prefs.getDouble('musicValue') as double;
+    }
+    if(LocalStorage.prefs.getBool('muteMusic') != null) {
+      _muteMusic = LocalStorage.prefs.getBool('muteMusic') as bool;
+      if (_muteMusic) {
+        _musicIcon = _muted;
+      } else {
+        _musicIcon = _nonMuted;
+      }
+    }
+    if(LocalStorage.prefs.getDouble('oldMusicValue') != null) {
+      _oldMusicValue = LocalStorage.prefs.getDouble('oldMusicValue') as double;
+    }
+    if(LocalStorage.prefs.getDouble('soundEffectsValue') != null) {
+      _soundEffectsValue = LocalStorage.prefs.getDouble('soundEffectsValue') as double;
+    }
+    if(LocalStorage.prefs.getBool('muteSoundEffects') != null) {
+      _muteSoundEffects = LocalStorage.prefs.getBool('muteSoundEffects') as bool;
+      if (_muteSoundEffects) {
+        _soundEffectsIcon = _muted;
+      } else {
+        _soundEffectsIcon = _nonMuted;
+      }
+    }
+    if(LocalStorage.prefs.getDouble('oldSoundEffectsValue') != null) {
+      _oldSoundEffectsValue = LocalStorage.prefs.getDouble('oldSoundEffectsValue') as double;
+    }
+    if(LocalStorage.prefs.getBool('darkMode') != null) {
+      _darkMode = LocalStorage.prefs.getBool('darkMode') as bool;
+    }
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    LocalStorage.prefs.setDouble('musicValue', _musicValue);
+    LocalStorage.prefs.setDouble('oldMusicValue', _oldMusicValue);
+    LocalStorage.prefs.setBool('muteMusic', _muteMusic);
+    LocalStorage.prefs.setDouble('soundEffectsValue', _soundEffectsValue);
+    LocalStorage.prefs.setDouble('oldSoundEffectsValue', _oldSoundEffectsValue);
+    LocalStorage.prefs.setBool('muteSoundEffects', _muteSoundEffects);
+    LocalStorage.prefs.setBool('darkMode', _darkMode);
+    super.dispose();
   }
 
   @override
@@ -142,7 +213,8 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             const SizedBox(height: 10,),
             const Divider(
-              color: Colors.indigoAccent,
+              indent: 0,
+              endIndent: 0,
             ),
             const SizedBox(height: 10,),
             const Text(
@@ -158,24 +230,16 @@ class _SettingsPageState extends State<SettingsPage> {
                   width: 100,
                   child: Text('Modo oscuro'),
                 ),
-                const Expanded(
-                  child: SizedBox(),
-                ),
+                const Spacer(),
                 Switch(
                   value: _darkMode,
-                  onChanged: (value) {
-                    setState(() {
-                      _darkMode = value;
-                      if (_darkMode) {
-                        SettingsPage.themeNotifier.value = ThemeMode.dark;
-                      } else {
-                        SettingsPage.themeNotifier.value = ThemeMode.light;
-                      }
-                    });
+                  onChanged: (bool value) {
+                    _darkMode = value;
+                    setDarkMode();
                   },
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),
