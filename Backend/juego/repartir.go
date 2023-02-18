@@ -23,14 +23,14 @@ type Carta struct { //Struct utilizado para definir la estructura de datos que r
 
 func compararCartasN(a Carta, b Carta) int { //Función parte del sort encargada de filtrar las cartas por valor y color
 	if a.Valor < b.Valor {
-		return 1
-	} else if a.Valor > b.Valor {
 		return -1
+	} else if a.Valor > b.Valor {
+		return 1
 	} else {
 		if a.Color < b.Color {
-			return 1
-		} else if a.Color > b.Color {
 			return -1
+		} else if a.Color > b.Color {
+			return 1
 		} else {
 			return 0
 		}
@@ -100,6 +100,193 @@ func mostrarMano(mano *doublylinkedlist.List) { //Función que muestra los valor
 
 // Función encargada de encontrar una escalera en la mano, devuelve los puntos del trio, las
 // cartas que lo forman y si se ha encontrado trio
+func calcularEscalerasJoker(mano *doublylinkedlist.List, joker *doublylinkedlist.List) (int,
+	*doublylinkedlist.List, *doublylinkedlist.List, bool) {
+	fmt.Println("Escalesras joker")
+	puntos := 0
+	comb := doublylinkedlist.New()
+	// ordenar la mano por palos de menor a mayor
+	mano = SortStart(mano, 1)
+	mostrarMano(mano)
+	nuevoPalo := true
+	hay_as := false
+	ind_as := 0
+	esc := false
+	num_j := joker.Size()
+
+	no_elim := -1
+	if num_j > 0 {
+		fmt.Println("Hay joker")
+		// bucle hasta que recorre toda la mano o encuentra una escalera
+		for i := 0; i < mano.Size() && !esc; i++ {
+			num_j_anyadidos := 0
+			num_c := 1
+			puntos_t := 0
+			v1, _ := mano.Get(i)
+			carta1, _ := v1.(Carta)
+			// comprobar si hay as en el palo
+			if nuevoPalo {
+				hay_as = carta1.Valor == 1
+				ind_as = i
+			}
+			if carta1.Valor >= 10 {
+				puntos_t = puntos_t + 10
+			} else {
+				puntos_t = puntos_t + carta1.Valor
+			}
+			// lista temporal donde añadir las cartas que se van encontrando de la escalera
+			l := *doublylinkedlist.New()
+			l.Add(carta1)
+			i_inf := i
+			hay_esc := true
+			mirar_j := false
+			for hay_esc {
+				v2, _ := mano.Get(i + 1)
+				carta2, _ := v2.(Carta)
+				if carta1.Palo == carta2.Palo {
+					nuevoPalo = false
+				} else {
+					nuevoPalo = true
+				}
+				// comprobar si las dos cartas son escalera
+				if carta1.Valor+1 == carta2.Valor && carta1.Palo == carta2.Palo {
+					fmt.Println("dos seguidas")
+					fmt.Println(carta1)
+					fmt.Println(carta2)
+					//añadir la nueva carta a l
+					l.Add(carta2)
+					if carta2.Valor >= 10 {
+						puntos_t = puntos_t + 10
+					} else {
+						puntos_t = puntos_t + carta2.Valor
+					}
+					num_c += 1
+					i++
+					carta1 = carta2
+				} else if carta1.Valor == 13 && hay_as && !mirar_j {
+					fmt.Println("rey-as")
+					fmt.Println(carta1)
+					// hay escalera valida de la forma 11 12 AS
+					// recupero la carta del as
+					as, _ := mano.Get(ind_as)
+					as_c, _ := as.(Carta)
+					l.Add(as_c)
+					puntos_t = puntos_t + 11
+					num_c += 1
+					mirar_j = true
+				} else if carta1.Valor == carta2.Valor && carta1.Palo == carta2.Palo {
+					// dos cartas con el mismo numero seguidas, avanzo indice
+					i++
+					if no_elim == -1 {
+						no_elim = i
+					} else {
+						no_elim = no_elim*100 + i
+					}
+
+				} else if num_j > 0 { // mirar si puedo añadir el joker para hacer escalera
+					fmt.Println("añadir joker a ", carta1)
+					v_joker, _ := joker.Get(num_j - 1)
+					c_joker, _ := v_joker.(Carta)
+					l.Add(c_joker)
+					num_j_anyadidos++
+					if carta1.Valor == 13 && !hay_as { //joker como as
+						puntos_t = puntos_t + 11
+					} else if carta1.Valor >= 10 {
+						puntos_t = puntos_t + 10
+						if mirar_j {
+							l.Swap(l.Size()-1, l.Size()-3)
+							l.Swap(l.Size()-1, l.Size()-2)
+						}
+					} else {
+						puntos_t = puntos_t + carta1.Valor + 1
+					}
+					num_j--
+					num_c++
+					carta1 = Carta{carta1.Valor + 1, carta1.Palo, carta1.Color}
+					if hay_as {
+						hay_esc = false
+					}
+				} else {
+					hay_esc = false
+				}
+
+			}
+			if num_c >= 3 && num_c-num_j_anyadidos >= 2 {
+				fmt.Println("numer joker añ", num_j_anyadidos)
+				fmt.Println("num joker quedan", num_j)
+				// si el numero de cartas seguidas ha sido >=3, escalera valida
+				puntos += puntos_t
+				// añado l a la combinación a devolver
+				comb.Add(l)
+				comb.Each((func(index int, value interface{}) {
+					fmt.Printf("cl %d: %v\n", index, value)
+				}))
+				fmt.Printf("BORRAR %d  %d\n", i, i_inf)
+				if !mirar_j {
+					// si no hay AS, borro de la mano las cartas de los indices seguidos que correspondan
+					k := no_elim % 100
+					no_elim = no_elim / 100
+					for j := i; j >= i_inf; j-- {
+						fmt.Printf("A BORRAR %d\n", j)
+						fmt.Printf("NO BORRAR %d\n", k)
+						if j != k {
+							mano.Remove(j)
+							fmt.Printf("BORRARDO %d\n", j)
+							mostrarMano(mano)
+							if j < k {
+								k = no_elim % 100
+								no_elim = no_elim / 100
+								if k == 0 {
+									k = -1
+								}
+							}
+						}
+
+					}
+				} else {
+					// si hay AS, borro las cartas de la mano de los indices seguidos, ADEMAS del indice del AS
+					k := no_elim % 100
+					no_elim = no_elim / 100
+					for j := i; j >= i_inf; j-- {
+						fmt.Printf("A BORRAR %d\n", j)
+						fmt.Printf("NO BORRAR %d\n", k)
+						if j != k {
+							mano.Remove(j)
+							fmt.Printf("BORRARDO %d\n", j)
+							mostrarMano(mano)
+							if j < k {
+								k = no_elim % 100
+								no_elim = no_elim / 100
+								if k == 0 {
+									k = -1
+								}
+							}
+						}
+					}
+					mano.Remove(ind_as)
+					fmt.Printf("BORRARDO %d\n", ind_as)
+					mostrarMano(mano)
+				}
+				fmt.Printf("JOKERS QUEDAN")
+				mostrarMano(joker)
+				fmt.Printf("BORRAR JOKER 0 %d\n", num_j_anyadidos)
+				for j := 0; j < num_j_anyadidos; j++ {
+					joker.Remove(0)
+					mostrarMano(joker)
+				}
+				esc = true
+			} else {
+				num_j = num_j + num_j_anyadidos
+				mirar_j = false
+			}
+		}
+	}
+
+	return puntos, comb, joker, esc
+}
+
+// Función encargada de encontrar una escalera en la mano, devuelve los puntos del trio, las
+// cartas que lo forman y si se ha encontrado trio
 func calcularEscaleras(mano *doublylinkedlist.List) (int, *doublylinkedlist.List, bool) {
 	puntos := 0
 	comb := doublylinkedlist.New()
@@ -110,6 +297,7 @@ func calcularEscaleras(mano *doublylinkedlist.List) (int, *doublylinkedlist.List
 	hay_as := false
 	ind_as := 0
 	esc := false
+	no_elim := -1
 	// bucle hasta que recorre toda la mano o encuentra una escalera
 	for i := 0; i < mano.Size() && !esc; i++ {
 		num_c := 1
@@ -131,6 +319,7 @@ func calcularEscaleras(mano *doublylinkedlist.List) (int, *doublylinkedlist.List
 		l.Add(carta1)
 		i_inf := i
 		hay_esc := true
+		borrar_as := false
 		for hay_esc {
 			v2, _ := mano.Get(i + 1)
 			carta2, _ := v2.(Carta)
@@ -159,9 +348,15 @@ func calcularEscaleras(mano *doublylinkedlist.List) (int, *doublylinkedlist.List
 				puntos_t = puntos_t + 11
 				num_c += 1
 				hay_esc = false
-			} else if carta1.Valor == carta2.Valor {
+				borrar_as = true
+			} else if carta1.Valor == carta2.Valor && carta1.Palo == carta2.Palo {
 				// dos cartas con el mismo numero seguidas, avanzo indice
 				i++
+				if no_elim == -1 {
+					no_elim = i
+				} else {
+					no_elim = no_elim*100 + i
+				}
 			} else {
 				// no hay escalera
 				hay_esc = false
@@ -176,20 +371,46 @@ func calcularEscaleras(mano *doublylinkedlist.List) (int, *doublylinkedlist.List
 			comb.Each((func(index int, value interface{}) {
 				fmt.Printf("cl %d: %v\n", index, value)
 			}))
-			fmt.Printf("BORRAR %d  %d\n", i_inf+num_c-1, i_inf)
-			if !hay_as {
+			fmt.Printf("BORRAR %d  %d\n", i, i_inf)
+			if !borrar_as {
 				// si no hay AS, borro de la mano las cartas de los indices seguidos que correspondan
-				for j := i_inf + num_c - 1; j >= i_inf; j-- {
-					mano.Remove(j)
-					fmt.Printf("BORRARDO %d\n", j)
-					mostrarMano(mano)
+				k := no_elim % 100
+				no_elim = no_elim / 100
+				for j := i; j >= i_inf; j-- {
+					fmt.Printf("A BORRAR %d\n", j)
+					fmt.Printf("NO BORRAR %d\n", k)
+					if j != k {
+						mano.Remove(j)
+						fmt.Printf("BORRARDO %d\n", j)
+						mostrarMano(mano)
+						if j < k {
+							k = no_elim % 100
+							no_elim = no_elim / 100
+							if k == 0 {
+								k = -1
+							}
+						}
+					}
 				}
 			} else {
 				// si hay AS, borro las cartas de la mano de los indices seguidos, ADEMAS del indice del AS
-				for j := i_inf + num_c - 2; j >= i_inf; j-- {
-					mano.Remove(j)
-					fmt.Printf("BORRARDO %d\n", j)
-					mostrarMano(mano)
+				k := no_elim % 100
+				no_elim = no_elim / 100
+				for j := i; j >= i_inf; j-- {
+					fmt.Printf("A BORRAR %d\n", j)
+					fmt.Printf("NO BORRAR %d\n", k)
+					if j != k {
+						mano.Remove(j)
+						fmt.Printf("BORRARDO %d\n", j)
+						mostrarMano(mano)
+						if j < k {
+							k = no_elim % 100
+							no_elim = no_elim / 100
+							if k == 0 {
+								k = -1
+							}
+						}
+					}
 				}
 				mano.Remove(ind_as)
 				fmt.Printf("BORRARDO %d\n", ind_as)
@@ -199,6 +420,67 @@ func calcularEscaleras(mano *doublylinkedlist.List) (int, *doublylinkedlist.List
 		}
 	}
 	return puntos, comb, esc
+}
+
+// Función encargada de encontrar un trío con joker en la mano, devuelve los puntos del trio, las
+// cartas que lo forman, si se ha encontrado trio y los jokers que quedan
+func calcularTriosJoker(mano *doublylinkedlist.List, joker *doublylinkedlist.List) (int,
+	*doublylinkedlist.List, *doublylinkedlist.List, bool) {
+	fmt.Println("Calcular trios con joker")
+	fmt.Println("Lista de joker")
+	mostrarMano(joker)
+	puntos := 0
+	mano = SortStart(mano, 0)
+	comb := doublylinkedlist.New()
+	fmt.Println("Mano")
+	mostrarMano(mano)
+	fmt.Println("Empezar")
+	trio := false
+	if !joker.Empty() {
+		// bucle hasta que recorre toda la mano o encuentra un trio
+		for i := 0; i < mano.Size()-2 && !trio; i++ {
+			i_inf := i
+			v1, _ := mano.Get(i)
+			carta1, _ := v1.(Carta)
+			v2, _ := mano.Get(i + 1)
+			carta2, _ := v2.(Carta)
+			if carta1.Valor == carta2.Valor {
+				// las tres cartas tienen el mismo numero
+				fmt.Println("carta: ", carta1)
+				fmt.Println("carta2: ", carta2)
+				if carta1.Palo != carta2.Palo {
+					// las tres cartas son de distinto palo
+					trio = true
+					fmt.Println("carta: ", carta1, " ok")
+					// lista donde añadir las cartas del trio
+					l := *doublylinkedlist.New()
+					l.Add(carta1)
+					l.Add(carta2)
+					v_joker, _ := joker.Get(0)
+					c_joker, _ := v_joker.(Carta)
+					l.Add(c_joker)
+					if carta1.Valor == 1 {
+						puntos = puntos + 11*3
+					} else if carta1.Valor >= 10 {
+						puntos = puntos + 10*3
+					} else {
+						puntos = puntos + carta1.Valor*3
+					}
+					i += 1
+
+					for j := i; j >= i_inf; j-- {
+						// se eliminan de la mano las cartas que hemos cojido
+						mano.Remove(j)
+						fmt.Printf("BORRARDO %d\n", j)
+						mostrarMano(mano)
+					}
+					joker.Remove(0) // borro joker
+					comb.Add(l)
+				}
+			}
+		}
+	}
+	return puntos, comb, joker, trio
 }
 
 // Función encargada de encontrar un trío en la mano, devuelve los puntos del trio, las
@@ -275,10 +557,32 @@ func calcularTrios(mano *doublylinkedlist.List) (int, *doublylinkedlist.List, bo
 	return puntos, comb, trio
 }
 
+func separarJokers(mano *doublylinkedlist.List) (*doublylinkedlist.List, *doublylinkedlist.List) {
+	fmt.Println("Separar jokers")
+	mano = SortStart(mano, 0)
+	joker := doublylinkedlist.New()
+	mostrarMano(mano)
+	hay_j := true
+	for hay_j {
+		v, _ := mano.Get(mano.Size() - 1)
+		carta, _ := v.(Carta)
+		fmt.Println("mirar joker ", carta)
+		if carta.Valor == 0 {
+			joker.Add(carta)
+			mano.Remove(mano.Size() - 1)
+		} else {
+			hay_j = false
+		}
+	}
+	return mano, joker
+}
+
 func calcularPuntosPosibles(mano *doublylinkedlist.List) (int, *doublylinkedlist.List) { //Función encargada de revisar los puntos posibles de una mano
 	puntos := 0
 	esc := true
 	comb := doublylinkedlist.New()
+	mano, joker := separarJokers(mano)
+	trio := true
 	for esc {
 		// bucle para encontrar todas las escaleras
 		puntos_m, combE, escR := calcularEscaleras(mano)
@@ -289,7 +593,17 @@ func calcularPuntosPosibles(mano *doublylinkedlist.List) (int, *doublylinkedlist
 		}
 		esc = escR
 	}
-	trio := true
+	esc_j := true
+	for esc_j {
+		puntos_m, combE, jokerR, escR := calcularEscalerasJoker(mano, joker)
+		puntos += puntos_m
+		if escR {
+			//añade a comb el nuevo trio encontrado
+			comb.Add(combE)
+		}
+		esc_j = escR
+		joker = jokerR
+	}
 	for trio {
 		// bucle para encontrar todos los trios
 		puntos_m, combT, trioR := calcularTrios(mano)
@@ -299,6 +613,17 @@ func calcularPuntosPosibles(mano *doublylinkedlist.List) (int, *doublylinkedlist
 			comb.Add(combT)
 		}
 		trio = trioR
+	}
+	trio_j := true
+	for trio_j {
+		puntos_m, combT, jokerR, trioR := calcularTriosJoker(mano, joker)
+		puntos += puntos_m
+		if trioR {
+			//añade a comb el nuevo trio encontrado
+			comb.Add(combT)
+		}
+		trio_j = trioR
+		joker = jokerR
 	}
 
 	return puntos, comb
@@ -472,12 +797,12 @@ func realizarJugada(t *tablero, mano *doublylinkedlist.List, jugada int, i int, 
 }
 
 func main() {
-	/*fmt.Println("Hola1")
+	fmt.Println("Hola1")
 	rand.Seed(time.Now().UnixNano())
 	mazo := doublylinkedlist.New()
-	// descarte := doublylinkedlist.New()
-	// i := 4
-	// fmt.Println("Hola2")
+	//descarte := doublylinkedlist.New()
+	//i := 4
+	fmt.Println("Hola2")
 
 	creacionBaraja(mazo)
 	fmt.Println("Hola3")
@@ -514,7 +839,7 @@ func main() {
 			}
 		}
 
-	}*/
+	}
 
 	// for i := 0; i < comb.Size(); i++ {
 	// 	fmt.Printf("combinacion %d: \n", i)
@@ -582,14 +907,14 @@ func main() {
 
 	// mostrarMano(mano)
 	// fmt.Println("--------------------------")
-	t,mano := iniciarTablero()
-	mostrarTablero(t)
-	mostrarMano(mano)
+	// t, mano := iniciarTablero()
+	// mostrarTablero(t)
+	// mostrarMano(mano)
 
-	jugada := doublylinkedlist.New()
-	v1, _ := mano.Get(0)
-	carta, _ := v1.(Carta)
-	jugada.Add(carta)
+	// jugada := doublylinkedlist.New()
+	// v1, _ := mano.Get(0)
+	// carta, _ := v1.(Carta)
+	// jugada.Add(carta)
 	// v1, _ = mano.Get(1)
 	// carta, _ = v1.(Carta)
 	// jugada.Add(carta)
@@ -608,27 +933,27 @@ func main() {
 	// v1, _ = mano.Get(6)
 	// carta, _ = v1.(Carta)
 	// jugada.Add(carta)
-	c := doublylinkedlist.New()
-	v1, _ = t.Mazo.Get(0)
-	carta, _ = v1.(Carta)
-	v1, _ = t.Mazo.Get(1)
-	carta2, _ := v1.(Carta)
-	v1, _ = t.Mazo.Get(2)
-	carta3, _ := v1.(Carta)
-	c.Add(carta)
-	c.Add(carta2)
-	c.Add(carta3)
-	t.Combinaciones.PushBack(c)
-	c1 := doublylinkedlist.New()
-	c1.Add(carta2)
-	c1.Add(carta3)
-	c1.Add(carta)
-	t.Combinaciones.PushBack(c1)
-	mostrarTablero(t)
+	// c := doublylinkedlist.New()
+	// v1, _ = t.Mazo.Get(0)
+	// carta, _ = v1.(Carta)
+	// v1, _ = t.Mazo.Get(1)
+	// carta2, _ := v1.(Carta)
+	// v1, _ = t.Mazo.Get(2)
+	// carta3, _ := v1.(Carta)
+	// c.Add(carta)
+	// c.Add(carta2)
+	// c.Add(carta3)
+	// t.Combinaciones.PushBack(c)
+	// c1 := doublylinkedlist.New()
+	// c1.Add(carta2)
+	// c1.Add(carta3)
+	// c1.Add(carta)
+	// t.Combinaciones.PushBack(c1)
+	// mostrarTablero(t)
 
-	realizarJugada(&t, mano, 3, 0, jugada)
-	mostrarTablero(t)
-	mostrarMano(mano)
+	// realizarJugada(&t, mano, 3, 0, jugada)
+	// mostrarTablero(t)
+	// mostrarMano(mano)
 
 	// realizarJugada(&t, mano, 1, i, jugada)
 	// mostrarTablero(t)

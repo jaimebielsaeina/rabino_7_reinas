@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 
-final addFriendFormKey = GlobalKey<FormState>();
+final joinGameFormKey = GlobalKey<FormState>();
 
-class AddFriendPage extends StatelessWidget {
-  const AddFriendPage({super.key});
+class JoinGameDialog extends StatelessWidget {
+  const JoinGameDialog({super.key});
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Añadir amigo con ID'),
+      title: const Text('Unirse a partida'),
       content: Form(
-        key: addFriendFormKey,
+        key: joinGameFormKey,
         child: TextFormField(
           autofocus: true,
           keyboardType: TextInputType.text,
           decoration: const InputDecoration(
-            hintText: '#1234',
+            hintText: '45tg34g435',
           ),
           validator: (value) {
             if (value == null || value.isEmpty) {
@@ -30,7 +30,7 @@ class AddFriendPage extends StatelessWidget {
       actions: [
         FilledButton(
           onPressed: () {
-            if(addFriendFormKey.currentState!.validate()) {
+            if(joinGameFormKey.currentState!.validate()) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('Amigo añadido'),
@@ -40,7 +40,7 @@ class AddFriendPage extends StatelessWidget {
               Navigator.pop(context);
             }
           },
-          child: const Text('Añadir amigo'),
+          child: const Text('Unirse'),
         ),
         FilledButton(
           onPressed: () {
