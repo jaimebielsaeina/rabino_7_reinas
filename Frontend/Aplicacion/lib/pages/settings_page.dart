@@ -213,8 +213,7 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             const SizedBox(height: 10,),
             const Divider(
-              indent: 0,
-              endIndent: 0,
+              color: Colors.indigoAccent,
             ),
             const SizedBox(height: 10,),
             const Text(

@@ -30,8 +30,6 @@ class LightTheme {
     dividerTheme: const DividerThemeData(
       color: Colors.indigoAccent,
       space: 1,
-      indent: 10,
-      endIndent: 10,
     ),
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
       shape: CircleBorder(

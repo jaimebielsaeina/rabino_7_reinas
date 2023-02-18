@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'dialogs/join_game_dialog.dart';
 import 'dialogs/add_friend_dialog.dart';
 import 'dialogs/login_dialog.dart';
 import 'pages/settings_page.dart';
@@ -260,7 +261,15 @@ class _MainPageState extends State<MainPage> {
                         Expanded(
                           child: Padding(
                             padding: const EdgeInsets.all(10),
-                            child: FilledButton(onPressed: (){}, child: Text('Unirse a partida'),),
+                            child: FilledButton(
+                              onPressed: (){
+                                showDialog(
+                                    context: context,
+                                    builder: (context) => const JoinGameDialog()
+                                );
+                              },
+                              child: Text('Unirse a partida'),
+                            ),
                           ),
                         ),
                         Expanded(
@@ -332,10 +341,47 @@ class _MainPageState extends State<MainPage> {
                     separatorBuilder: (context, index) => const Divider(),
                   ),
                   ListView.separated(
-                    itemCount: 20,
+                    itemCount: 101,
                     itemBuilder: (context, index) {
                       return ListTile(
-                        leading: FriendListTile(),
+                        contentPadding: const EdgeInsets.all(10),
+                        leading: SizedBox(
+                          width: 120,
+                          child: Row(
+                            children: [
+                              (index == 0)
+                                  ? const Icon(
+                                Icons.wine_bar,
+                                color: Colors.amber,
+                                size: 35,
+                              )
+                                  : (index == 1)?
+                              const Icon(
+                                Icons.wine_bar,
+                                color: Colors.grey,
+                                size: 35,
+                              )
+                                  : (index == 2)?
+                              const Icon(
+                                Icons.wine_bar,
+                                color: Colors.deepOrangeAccent,
+                                size: 35,
+                              )
+                              : Padding(
+                                padding: const EdgeInsets.only(left: 8.0),
+                                child: Text(
+                                  '$index',
+                                  style: const TextStyle(
+                                      fontSize: 25,
+                                      color: Colors.indigoAccent
+                                  ),
+                                ),
+                              ),
+                              const Spacer(),
+                              const FriendListTile(),
+                            ],
+                          ),
+                        ),
                         title: Row(
                           children: const [
                             Text(
@@ -347,32 +393,14 @@ class _MainPageState extends State<MainPage> {
                             ),
                           ],
                         ),
-                        subtitle: Text('perro'),
-                        trailing: (index == 0)? 
-                          const Icon(
-                            Icons.wine_bar,
+                        trailing: Container(
+                          padding: EdgeInsets.all(5),
+                          decoration: const BoxDecoration(
                             color: Colors.amber,
-                            size: 35,
-                          )
-                        : (index == 1)?
-                          const Icon(
-                            Icons.wine_bar,
-                            color: Colors.grey,
-                            size: 35,
-                          )
-                        : (index == 2)?
-                          const Icon(
-                            Icons.wine_bar,
-                            color: Colors.deepOrangeAccent,
-                            size: 35,
-                          )
-                        : Text(
-                            '$index',
-                            style: const TextStyle(
-                              fontSize: 25,
-                              color: Colors.indigoAccent
-                            ),
+                            borderRadius: BorderRadius.all(Radius.circular(50))
                           ),
+                          child: const Text('8000'),
+                        ),
                         onTap: () {},
                       );
                     },
