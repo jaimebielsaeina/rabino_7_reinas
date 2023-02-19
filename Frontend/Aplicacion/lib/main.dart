@@ -2,8 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'dialogs/join_game_dialog.dart';
 import 'dialogs/add_friend_dialog.dart';
-import 'dialogs/login_dialog.dart';
 import 'pages/settings_page.dart';
+import 'pages/login_page.dart';
 import 'services/local_storage.dart';
 import 'themes/light_theme.dart';
 import 'themes/dark_theme.dart';
@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
           theme: LightTheme.lightTheme,
           darkTheme: DarkTheme.darkTheme,
           themeMode: currentMode,
-          home: const MyHomePage(),
+          home: const Login(),
         );
       }
     );
@@ -164,16 +164,6 @@ class _MainPageState extends State<MainPage> {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        /*
-        appBar: AppBar(
-          bottom:TabBar(
-            tabs: [
-              Tab(icon: Icon(Icons.tag_faces_rounded),),
-              Tab(icon: Icon(Icons.tag_faces_rounded),),
-            ],
-          ),
-        ),
-        */
         body:
         Column(
           children: [
@@ -264,8 +254,8 @@ class _MainPageState extends State<MainPage> {
                             child: FilledButton(
                               onPressed: (){
                                 showDialog(
-                                    context: context,
-                                    builder: (context) => const JoinGameDialog()
+                                  context: context,
+                                  builder: (context) => const JoinGameDialog()
                                 );
                               },
                               child: Text('Unirse a partida'),
@@ -276,9 +266,7 @@ class _MainPageState extends State<MainPage> {
                           child: Padding(
                             padding: const EdgeInsets.all(10),
                             child: FilledButton(
-                              onPressed: (){
-                                openDialog();
-                              },
+                              onPressed: (){},
                               child: Text('Crear partida'),
                             ),
                           ),
@@ -394,7 +382,7 @@ class _MainPageState extends State<MainPage> {
                           ],
                         ),
                         trailing: Container(
-                          padding: EdgeInsets.all(5),
+                          padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 5.0),
                           decoration: const BoxDecoration(
                             color: Colors.amber,
                             borderRadius: BorderRadius.all(Radius.circular(50))
@@ -414,13 +402,6 @@ class _MainPageState extends State<MainPage> {
       ),
     );
   }
-
-  Future openDialog() => showDialog(
-    context: context,
-    builder: (context) => const Dialog(
-      child: LoginPage(),
-    ),
-  );
 }
 
 
@@ -435,9 +416,12 @@ class GamePage extends StatelessWidget {
         title: Text('Torneo'),
       ),
       body: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 10.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Center(
+            SizedBox(
+              height: 200,
               child: Hero(
                 tag: id,
                 child: Icon(
@@ -446,6 +430,25 @@ class GamePage extends StatelessWidget {
                   color: Colors.amber,
                 ),
               ),
+            ),
+            Container(
+              height: 200,
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.indigoAccent, width: 1),
+                borderRadius: BorderRadius.circular(20)
+              ),
+              child: ListView.builder(
+                itemCount: 16,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title: Text('adasdasd'),
+                  );
+                },
+              ),
+            ),
+            FilledButton(
+              onPressed: (){},
+              child: Text('Unirse'),
             ),
           ],
         ),
@@ -610,7 +613,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   Column(
                     children: [
                       Text(
-                        'SUERTE',
+                        'PUNTOS',
                         style: TextStyle(
                           color: Colors.blueGrey[700],
                           fontWeight: FontWeight.bold

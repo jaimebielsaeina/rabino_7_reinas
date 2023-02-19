@@ -55,8 +55,11 @@ class DarkTheme {
           color: Colors.amber
       ),
     ),
-    colorSchemeSeed: Colors.indigo,
-    brightness: Brightness.dark,
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: Colors.indigo,
+      brightness: Brightness.dark,
+    ),
+    //colorSchemeSeed: Colors.indigo,
     useMaterial3: true,
   );
 }

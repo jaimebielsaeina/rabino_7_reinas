@@ -55,8 +55,11 @@ class LightTheme {
           color: Colors.amber
       ),
     ),
-    colorSchemeSeed: Colors.indigo,
-    brightness: Brightness.light,
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: Colors.indigo,
+      brightness: Brightness.light,
+    ),
+    //colorSchemeSeed: Colors.indigo,
     useMaterial3: true,
   );
 }
