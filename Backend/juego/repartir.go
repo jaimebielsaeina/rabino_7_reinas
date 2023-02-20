@@ -649,17 +649,126 @@ func suma51(jugada *doublylinkedlist.List) bool { // cuenta los puntos de la pri
 	}
 }
 
-/*
-Devuelve true cuabdo sea ha podido realizar la juaga con exito y
-false en caso contrario
-*/
-func abrir(jugada *doublylinkedlist.List, mano *doublylinkedlist.List, t *tablero) bool { //falta comprobar trios y escaleras
-	jugada = SortStart(jugada, 0)
+
+func partitionMenorMayor(mano *doublylinkedlist.List, low, high int, tipo int) (*doublylinkedlist.List, int) { //Función del sort encargada de particionar los datos
+	v1, _ := mano.Get(high)
+	carta1, _ := v1.(Carta)
+	i := low
+	for j := low; j < high; j++ {
+		v2, _ := mano.Get(j)
+		carta2, _ := v2.(Carta)
+		
+		if tipo == 0 {
+			if compararCartasN(carta1, carta2) == 1{
+				mano.Swap(i, j)
+				i++
+			}
+		} else if tipo == 1 {
+			if compararCartasE(carta1, carta2) == 1{
+				mano.Swap(i, j)
+				i++
+			}
+		}
+	}
+	
+	mano.Swap(i, high)
+	
+	return mano, i
+}
+
+func SortMenorMayor(mano *doublylinkedlist.List, low, high int, tipo int) *doublylinkedlist.List { //Función inicial del sort
+	if low < high {
+		var p int
+		mano, p = partitionMenorMayor(mano, low, high, tipo)
+		mano = SortMenorMayor(mano, low, p-1, tipo)
+		mano = SortMenorMayor(mano, p+1, high, tipo)
+	}
+	return mano
+}
+
+// igual que sort pero ordenando de menor a mayor (para que sea mas facil comprobar las escaleras)
+func SortStartMenorMayor(mano *doublylinkedlist.List, tipo int) *doublylinkedlist.List { //Función inicial del sort
+	return SortMenorMayor(mano, 0, mano.Size()-1, tipo)
+}
+
+// Devuelve la posición de los jokers que hay en una combinación 
+func posicionJoker(jugada *doublylinkedlist.List) *doublylinkedlist.List{
+	jokers := doublylinkedlist.New()
+	NumJokers := NumComodines(jugada)
+	fmt.Println(NumJokers)
+	index := 0
+	if NumJokers > 0 {
+		for numJ := 1; numJ <= NumJokers; numJ++ {
+			for i := index; i < jugada.Size(); i++ {
+				fmt.Println(i)
+				v1, _ := jugada.Get(i)
+				carta, _ := v1.(Carta)
+				if carta.Valor == 0 {
+					jokers.Add(i)
+					index = i + 1
+					break;
+				}
+			}
+		}
+	}
+	fmt.Println(jokers)
+	return jokers
+}
+
+// función que añade los jokers que estaban en un principio a la lista original, en la misma posición que antes
+func anyadirJokers(posicionJokers *doublylinkedlist.List, listaJokers *doublylinkedlist.List, jugada *doublylinkedlist.List) *doublylinkedlist.List{
+	aux := doublylinkedlist.New()
+	j := 0
+	indice := 0
+	primerJocker := true
+	for i := 0; i < jugada.Size(); i++ {
+		fmt.Println(i)
+		if j < posicionJokers.Size() {	//añade el joker en la posicion en la que estaba
+			v1, _ := posicionJokers.Get(j)
+			pos, _ := v1.(int) 
+			if i == pos {
+				v1, _ = listaJokers.Get(j)
+				carta, _ := v1.(Carta) 
+				aux.Add(carta)
+				j++
+				if primerJocker {
+					indice = i
+					primerJocker = false
+				} 
+			} else {
+				primerJocker = true
+				v1, _ := jugada.Get(i)	//añade las demás cartas de la jugada
+				carta, _ := v1.(Carta) 
+				aux.Add(carta)
+			}
+		} else {
+			i = indice
+			v1, _ := jugada.Get(i)	//añade las demás cartas de la jugada
+			carta, _ := v1.(Carta) 
+			aux.Add(carta)
+			indice++
+		}
+	}
+	return aux
+}
+
+// Devuelve true cuabdo se ha podido abrir con exito y
+// false en caso contrario
+func abrir(jugada *doublylinkedlist.List, mano *doublylinkedlist.List, t *tablero) bool{ //falta comprobar trios y escaleras
+	posJ := posicionJoker(jugada)
+	jugada,listaJokers := separarJokers(jugada)
+	jugada = SortStartMenorMayor(jugada, 0)
+	fmt.Println(jugada)
+	fmt.Println(listaJokers)
+	jugada = anyadirJokers(posJ, listaJokers, jugada)
+
+	fmt.Println(jugada)
 	if !EscaleraValida(jugada) && !TrioValido(jugada) {
+		fmt.Println("no valido")
 		return false
 	}
 	listaC := doublylinkedlist.New()
-	for i := 0; i <= jugada.Size()-1; i++ {
+	for i := 0; i <= jugada.Size() - 1; i++ {
 		v1, _ := jugada.Get(i)
 		carta, _ := v1.(Carta)
 
@@ -668,222 +777,67 @@ func abrir(jugada *doublylinkedlist.List, mano *doublylinkedlist.List, t *tabler
 		fmt.Println("carta eliminada", carta)
 		listaC.Add(carta)
 	}
-	//listaC = SortStart(listaC, 0)
 	t.Combinaciones.PushBack(listaC)
 	return true
 }
 
-/*
-
 // función para añadir una carta a una combinación
-//Devuelve -1 si es una juagada invalida, 0 si es valida, 1 si es valida y devuelve un comodin
-func anyadirCarta(jugada *doublylinkedlist.List, mano *doublylinkedlist.List, t *tablero, idCombinacion int) int {
-	index := 0
+// Devuelve -1 si es una jugada invalida, 0 si es valida y 1 si es valida y devuelve un comodin
+func anyadirCarta(jugada *doublylinkedlist.List, mano *doublylinkedlist.List, t *tablero, idCombinacion int) int{
+	fmt.Println("jugada:",jugada)
 	if !jugada.Empty() {
 		v1, _ := jugada.Get(0)
 		carta, _ := v1.(Carta)
-
+		devolverJoker := false
 		id_comb := 0
 		for e := t.Combinaciones.Front(); e != nil; e = e.Next() {
 			if id_comb == idCombinacion {
 				listaC := e.Value.(*doublylinkedlist.List)
+				fmt.Println("listaC:",listaC)
 				if NumComodines(listaC) > 0 {
-					/*for i := 0; i < listaC.Size(); i++ {
-						cart, _ := listaC.Get(i)//Cogemos la primera carta
-						cartaRef, _ := cart.(Carta)
-						CartaValor = cartaRef.Valor //Sacamos este valor por si es un comodin
+					posJ := posicionJoker(listaC)
+					listaC,listaJokers := separarJokers(listaC)
+					listaC = SortStartMenorMayor(listaC, 0)
+					fmt.Println("listaC:",listaC)
+					listaC.Add(carta)
+					fmt.Println("listaC:",listaC)
+					listaC = SortStartMenorMayor(listaC, 0)
+					fmt.Println("listaC:",listaC)
+					fmt.Println(listaJokers)
+					fmt.Println(posJ)
+					indice := listaC.IndexOf(carta)
 
-						if EsComodin(CartaValor){
-							if i > 0 && i < listaC.Size() {
-								cart_ant, _ := listaC.Get(i - 1)//Cogemos la primera carta
-								carta_ant, _ := cart_ant.(Carta)
-								CartaValorAnt = carta_ant.Valor //Sacamos este valor por si es un comodin
-								index = i
-								for u := index; u < listaC.Size() && EsComodin(CartaValorAnt) ; u++ { //Tomamos de referencia una carta que no sea comodin
-									cart_ant, _ := jugada.Get(index)//Cogemos la primera carta
-									carta_ant, _ := cart.(Carta)
-									CartaValorAnt = carta.Valor //Sacamos este valor por si es un comodin
-									index++
-								}
-
-								if EsComodin(CartaValorAnt) { //En caso de no encontrar el valor de iterrar a la derecha
-									index = i
-									for d := index; d >= 0 && EsComodin(CartaValorAnt); d-- {
-										cart_ant, _ := jugada.Get(index)//Cogemos la primera carta
-										carta_ant, _ := cart.(Carta)
-										CartaValorAnt = carta.Valor //Sacamos este valor por si es un comodin
-										index--
-									}
-
-									if carta.Valor == ( CartaValorAnt + Abs((index + 1) - i).(float64) ) ) {
-										listaC.Remove(i) //Aqui quitamos el coodin a intercambiar
-										listaC.Add(carta)
-										listaC = SortStart(listaC, 0)
-										if !EscaleraValida(listaC) && !TrioValido(listaC) {
-											return -1
-										}
-										t.Combinaciones.Remove(e)
-										t.Combinaciones.PushBack(listaC)
-										ind := mano.IndexOf(carta)
-										mano.Remove(ind)
-
-										return 1
-
-									}
-
-								} else {
-									if carta.Valor == ( CartaValorAnt + Abs((index - 1) - i).(float64) ) ) {
-										listaC.Remove(i) //Aqui quitamos el coodin a intercambiar
-										listaC.Add(carta)
-										listaC = SortStart(listaC, 0)
-										if !EscaleraValida(listaC) && !TrioValido(listaC) {
-											return -1
-										}
-										t.Combinaciones.Remove(e)
-										t.Combinaciones.PushBack(listaC)
-										ind := mano.IndexOf(carta)
-										mano.Remove(ind)
-
-										return 1
-
-									}
-								}
-
-							} else if index == 0 {
-								cart_ant, _ := listaC.Get(i + 1)//Cogemos la primera carta
-								carta_ant, _ := cart_ant.(Carta)
-								CartaValorAnt = carta_ant.Valor //Sacamos este valor por si es un comodin
-								index = i //Indice del comodin que miramos
-								for u := index; u < listaC.Size() && EsComodin(CartaValorAnt) ; u++ { //Tomamos de referencia una carta que no sea comodin
-									cart_ant, _ := jugada.Get(index)//Cogemos la primera carta
-									carta_ant, _ := cart.(Carta)
-									CartaValorAnt = carta.Valor //Sacamos este valor por si es un comodin
-									index++
-								}
-
-								if carta.Valor == ( CartaValorAnt - Abs(((index - 1) - i).(float64) ) ) {
-									listaC.Remove(i) //Aqui quitamos el coodin a intercambiar
-									listaC.Add(carta)
-									listaC = SortStart(listaC, 0)
-									if !EscaleraValida(listaC) && !TrioValido(listaC) {
-										return -1
-									}
-									t.Combinaciones.Remove(e)
-									t.Combinaciones.PushBack(listaC)
-									ind := mano.IndexOf(carta)
-									mano.Remove(ind)
-
-									return 1
-
-								}
-							}
-						} else {
-
-						}
-					}*/
-/*
-					for i := 0; i < listaC.Size(); i++ {
-						cart, _ := listaC.Get(i) //Cogemos la primera carta
-						cartaRef, _ := cart.(Carta)
-						CartaValor = cartaRef.Valor //Sacamos este valor por si es un comodin
-
-						if i == 0 { //Agniadir al primero o al final
-							if carta.Valor < CartaValor {
-								listaC.Add(carta)
-								listaC = SortStart(listaC, 0)
-								if !EscaleraValida(listaC) && !TrioValido(listaC) {
-									indice := listaC.IndexOf(carta)
-									cart, _ := listaC.Get(indice + 1) //Cogemos la primera carta
-									cartaRef, _ := cart.(Carta)
-									CartaValor = cartaRef.Valor //Sacamos este valor por si es un comodin
-
-									if EsComodin(CartaValor) {
-										listaC.Remove(indice + 1)
-										return 1
-									}
-									return -1
-								}
-
-								t.Combinaciones.Remove(e)
-								t.Combinaciones.PushBack(listaC)
-								ind := mano.IndexOf(carta)
-								mano.Remove(ind)
-							}
-						} else if i == (listaC.Size() - 1) {
-
-							if carta.Valor < CartaValor {
-								listaC.Add(carta)
-								listaC = SortStart(listaC, 0)
-								if !EscaleraValida(listaC) && !TrioValido(listaC) {
-									indice := listaC.IndexOf(carta)
-									cart, _ := listaC.Get(indice - 1) //Cogemos la primera carta
-									cartaRef, _ := cart.(Carta)
-									CartaValor = cartaRef.Valor //Sacamos este valor por si es un comodin
-
-									if EsComodin(CartaValor) {
-										listaC.Remove(indice - 1)
-										return 1
-									}
-									return -1
-								}
-
-								t.Combinaciones.Remove(e)
-								t.Combinaciones.PushBack(listaC)
-								ind := mano.IndexOf(carta)
-								mano.Remove(ind)
-							}
-
-						} else {
-							if carta.Valor < CartaValor {
-								listaC.Add(carta)
-								listaC = SortStart(listaC, 0)
-
-								if !TrioValido(listaC) {
-
-									if !EscaleraValida(listaC) {
-										indice := listaC.IndexOf(carta)
-										cart, _ := listaC.Get(indice - 1) //Cogemos la primera carta
-										cartaRef, _ := cart.(Carta)
-										CartaValor = cartaRef.Valor //Sacamos este valor por si es un comodin
-
-										if EsComodin(CartaValor) {
-											listaC.Remove(indice - 1)
-											if EscaleraValida(listaC) {
-												return 1
-											} else {
-												return -1
-											}
-										} else {
-											indice = listaC.IndexOf(carta)
-											cart, _ = listaC.Get(indice + 1) //Cogemos la primera carta
-											cartaRef, _ = cart.(Carta)
-											CartaValor = cartaRef.Valor //Sacamos este valor por si es un comodin
-
-											if EsComodin(CartaValor) {
-												listaC.Remove(indice + 1)
-												if EscaleraValida(listaC) {
-													return 1
-												} else {
-													return -1
-												}
-											}
-										}
-									}
-
-								}
-								t.Combinaciones.Remove(e)
-								t.Combinaciones.PushBack(listaC)
-								ind := mano.IndexOf(carta)
-								mano.Remove(ind)
-
-								return 0
-							}
-						}
+					
+					for i:= 0; i < posJ.Size(); i++ {
+						v1, _ := posJ.Get(i)
+						j, _ := v1.(int)
+						if indice == j {
+							devolverJoker = true
+							posJ.Remove(j)
+							v1, _ = listaJokers.Get(i)
+							joker, _ := v1.(int)
+							listaJokers.Remove(joker)
+						} 
 					}
+
+					listaC = anyadirJokers(posJ, listaJokers, listaC)
+					if !EscaleraValida(listaC) && !TrioValido(listaC) {
+						return -1
+					}
+					t.Combinaciones.Remove(e)
+					t.Combinaciones.PushBack(listaC)
+					ind := mano.IndexOf(carta)
+					mano.Remove(ind)
+					if devolverJoker {
+						return 1
+					} else {
+						return 0
+					}
+
 
 				} else {
 					listaC.Add(carta)
-					listaC = SortStart(listaC, 0)
+					listaC = SortStartMenorMayor(listaC, 0)
 					if !EscaleraValida(listaC) && !TrioValido(listaC) {
 						return -1
 					}
@@ -898,9 +852,8 @@ func anyadirCarta(jugada *doublylinkedlist.List, mano *doublylinkedlist.List, t 
 			id_comb++
 		}
 	}
+	return -1
 }
-
-*/
 
 func mostrarTablero(t tablero) {
 	fmt.Println("MAZO: ", t.Mazo)
@@ -917,6 +870,7 @@ func mostrarTablero(t tablero) {
 
 }
 
+// Inicializa el tablero y la mano del jugador (hay que cambiar lo de repartirMano cuando se hagan más jugadores)
 func iniciarTablero() (tablero, *doublylinkedlist.List) {
 
 	rand.Seed(time.Now().UnixNano())
@@ -932,6 +886,7 @@ func iniciarTablero() (tablero, *doublylinkedlist.List) {
 	return t, mano
 }
 
+//función que llama a la jugada que indique el jugador
 func realizarJugada(t *tablero, mano *doublylinkedlist.List, jugada int, i int, cartasAjugar *doublylinkedlist.List) {
 	switch jugada {
 	case 0: //Descarte
@@ -947,7 +902,7 @@ func realizarJugada(t *tablero, mano *doublylinkedlist.List, jugada int, i int, 
 		cartasAjugar.Clear()
 		return
 	case 3: //Añadir 1 carta a una combinación existente
-		//anyadirCarta(cartasAjugar, mano, t, 0)
+		anyadirCarta(cartasAjugar, mano, t, 0)
 		cartasAjugar.Clear()
 		return
 	default:
@@ -1149,6 +1104,7 @@ func TrioValido(jugada *doublylinkedlist.List) bool {
 }
 
 func main() {
+	/*
 	fmt.Println("Hola1")
 	rand.Seed(time.Now().UnixNano())
 	mazo := doublylinkedlist.New()
@@ -1221,6 +1177,44 @@ func main() {
 		fmt.Println("Mano final: ")
 		mostrarMano(mano)
 	}
+*/
+	t,mano := iniciarTablero()
+	mostrarMano(mano)
+	mostrarTablero(t)
+	jugada := doublylinkedlist.New()
+	carta := Carta{1, 1, 1}
+	jugada.Add(carta)
+	carta = Carta{0, 1, 1}
+	jugada.Add(carta)
+	carta = Carta{0, 1, 1}
+	jugada.Add(carta)
+	carta = Carta{4, 1, 1}
+	jugada.Add(carta)
+	carta = Carta{5, 1, 1}
+	jugada.Add(carta)
+	carta = Carta{6, 1, 1}
+	jugada.Add(carta)
+	carta = Carta{7, 1, 1}
+	jugada.Add(carta)
+	carta = Carta{8, 1, 1}
+	jugada.Add(carta)
+	carta = Carta{9, 1, 1}
+	jugada.Add(carta)
+	carta = Carta{10, 1, 1}
+	jugada.Add(carta)
+	
+	realizarJugada(&t, mano, 2, 0, jugada)
+	mostrarTablero(t)
+	mostrarMano(mano)
+	carta = Carta{3, 1, 1}
+	jugada.Add(carta)
+	realizarJugada(&t, mano, 3, 0, jugada)
+	mostrarTablero(t)
+	mostrarMano(mano)
+
+
+
+
 
 	// for i := 0; i < comb.Size(); i++ {
 	// 	fmt.Printf("combinacion %d: \n", i)
