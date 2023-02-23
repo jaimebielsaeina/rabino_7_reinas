@@ -2,6 +2,12 @@ import 'package:flutter/material.dart';
 
 class LightTheme {
   static final lightTheme = ThemeData(
+    useMaterial3: true,
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: Colors.indigo,
+      brightness: Brightness.light,
+    ),
+    //colorSchemeSeed: Colors.indigo,
     appBarTheme:  const AppBarTheme(
       color: Colors.indigo,
       centerTitle: true,
@@ -55,11 +61,5 @@ class LightTheme {
           color: Colors.amber
       ),
     ),
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: Colors.indigo,
-      brightness: Brightness.light,
-    ),
-    //colorSchemeSeed: Colors.indigo,
-    useMaterial3: true,
   );
 }

@@ -2,6 +2,12 @@ import 'package:flutter/material.dart';
 
 class DarkTheme {
   static final darkTheme = ThemeData(
+    useMaterial3: true,
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: Colors.indigo,
+      brightness: Brightness.dark,
+    ),
+    //colorSchemeSeed: Colors.indigo,
     appBarTheme: const AppBarTheme(
       color: Colors.indigo,
       centerTitle: true,
@@ -55,11 +61,5 @@ class DarkTheme {
           color: Colors.amber
       ),
     ),
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: Colors.indigo,
-      brightness: Brightness.dark,
-    ),
-    //colorSchemeSeed: Colors.indigo,
-    useMaterial3: true,
   );
 }
