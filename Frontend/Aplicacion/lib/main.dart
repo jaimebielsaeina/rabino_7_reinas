@@ -4,10 +4,12 @@ import 'dialogs/join_game_dialog.dart';
 import 'dialogs/add_friend_dialog.dart';
 import 'pages/settings_page.dart';
 import 'pages/login_page.dart';
+import 'pages/tournament_page.dart';
 import 'services/local_storage.dart';
 import 'themes/light_theme.dart';
 import 'themes/dark_theme.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,17 +47,17 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
 
-  void onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
   static final List<Widget> _widgetOptions = <Widget>[
     const MainPage(),
     const FriendsPage(),
     const ProfilePage(),
   ];
+
+  void onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -94,7 +96,23 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
-      bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar:
+      /* TODO
+      CurvedNavigationBar(
+        index: _selectedIndex,
+        height: 50,
+        color: Colors.indigo,
+        backgroundColor: Colors.transparent,
+        buttonBackgroundColor: Colors.amber,
+        items: const [
+          Icon(Icons.games_rounded, color: Colors.white,),
+          Icon(Icons.people_alt, color: Colors.white,),
+          Icon(Icons.account_circle, color: Colors.white,),
+        ],
+        onTap: onItemTapped,
+      ),
+      */
+      BottomNavigationBar(
         items: const [
           BottomNavigationBarItem(
             tooltip: 'Juegos',
@@ -396,59 +414,6 @@ class _MainPageState extends State<MainPage> {
                   ),
                 ],
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-
-class GamePage extends StatelessWidget {
-  const GamePage({super.key, required this.id});
-  final int id;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Torneo'),
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 10.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(
-              height: 200,
-              child: Hero(
-                tag: id,
-                child: Icon(
-                  Icons.wine_bar,
-                  size: 150,
-                  color: Colors.amber,
-                ),
-              ),
-            ),
-            Container(
-              height: 200,
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.indigoAccent, width: 1),
-                borderRadius: BorderRadius.circular(20)
-              ),
-              child: ListView.builder(
-                itemCount: 16,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text('adasdasd'),
-                  );
-                },
-              ),
-            ),
-            FilledButton(
-              onPressed: (){},
-              child: Text('Unirse'),
             ),
           ],
         ),

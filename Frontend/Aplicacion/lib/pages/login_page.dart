@@ -48,7 +48,7 @@ class _LoginState extends State<Login> {
                         Container(
                           margin: const EdgeInsets.all(40),
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.secondaryContainer,
+                            color: Theme.of(context).colorScheme.background,
                             borderRadius: BorderRadius.circular(30),
                           ),
                           child: Form(
