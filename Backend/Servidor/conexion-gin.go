@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
+	"github.com/olahol/melody"
 )
 
 // Nombres y contenido del struct debe ser publico si no no se hace el binding **Mejor moverlo a otro archivo**
@@ -22,6 +24,10 @@ type Register struct {
 func main() {
 	// Set the router as the default one shipped with Gin
 	router := gin.Default()
+	m := melody.New()
+
+	router.LoadHTMLFiles("chan.html")
+	router.Use(static.Serve("/", static.LocalFile(".", true)))
 
 	// Setup route group for the API
 	api := router.Group("/api")
@@ -40,6 +46,22 @@ func main() {
 
 		//Ejemplo para devolver structs de datos
 		api.GET("/prueba/users", getUsers)
+
+		//Carga la página del chat/lobby
+		api.GET("/channel/:lobby", func(c *gin.Context) {
+			c.HTML(http.StatusOK, "chan.html", nil)
+		})
+
+		api.GET("/ws/:lobby", func(c *gin.Context) {
+			m.HandleRequest(c.Writer, c.Request)
+		})
+
+		m.HandleMessage(func(s *melody.Session, msg []byte) {
+			m.BroadcastFilter(msg, func(q *melody.Session) bool { //Envia la información a todos con la misma url
+				return q.Request.URL.Path == s.Request.URL.Path
+			})
+		})
+
 	}
 
 	// Start and run the server
